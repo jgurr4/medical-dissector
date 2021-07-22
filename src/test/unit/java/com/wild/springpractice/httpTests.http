@@ -1,0 +1,7 @@
+// This page is for running http tests, just so you know how to use it.
+// However, you should not use this going forward. You should know how to run
+// http tests in java. You can run these tests only when app is running.
+// Also, instead of using this page, you can just click on any mapping and click
+// "open in http client"
+
+GET http://localhost:8080/api/student
