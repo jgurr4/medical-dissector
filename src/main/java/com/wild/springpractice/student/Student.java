@@ -1,10 +1,15 @@
 package com.wild.springpractice.student;
 
+import javax.persistence.*;
 import java.time.LocalDate;
 
+@Entity  // This is for hibernate to create table.
 public class Student {
 
+  @Id
+  @GeneratedValue(strategy=GenerationType.AUTO)
   private long id;
+
   private String name;
   private int age;
   private String email;
