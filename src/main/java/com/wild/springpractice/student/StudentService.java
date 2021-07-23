@@ -19,4 +19,8 @@ public class StudentService {
     return studentRepository.findAll();
   }
 
+  public String saveStudents(List<Student> students) {
+    return studentRepository.saveAll(students).size() == students.size() ? "success" : "failure";
+  }
+
 }

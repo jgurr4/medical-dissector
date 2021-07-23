@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,7 +26,7 @@ class SpringPracticeTests {
   }
 
   @Test
-  public void GetStudentsTest() {
+  public void getStudentsTest() {
     StudentService studentService = new StudentService(studentRepository);
     final List<Student> students = studentService.getStudents();
     System.out.println(students);
@@ -32,11 +34,16 @@ class SpringPracticeTests {
   }
 
   @Test
-  public void GetOneStudent() {
+  public void getOneStudent() {
   }
 
   @Test
-  public void SaveStudent() {
+  public void saveStudentsTest() {
+    StudentService studentService = new StudentService(studentRepository);
+    List<Student> students = List.of(
+      new Student(1, "john", 24, "john@mail.com", LocalDate.of(2002, Month.JANUARY, 2)),
+      new Student(2, "mary", 27, "mary@mail.com", LocalDate.of(1994, Month.APRIL, 5)));
+    assertEquals("success", studentService.saveStudents(students));
   }
 
 //  @Test
