@@ -2,33 +2,39 @@ package com.wild.springpractice.student;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.Period;
 
 @Entity  // This is for hibernate to create table.
+@Table
 public class Student {
 
   @Id
-  @GeneratedValue(strategy=GenerationType.AUTO)
-  private long id;
+  @SequenceGenerator(
+    name = "student_sequence",
+    sequenceName = "student_sequence",
+    allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "student_sequence")
+  private Long id;   // The code above is how you make spring auto-generate the id.
 
   private String name;
-  private int age;
   private String email;
   private LocalDate dob;
+  // This tells spring boot that we don't need to construct a age column because we will calculate it based on dob instead.
+  @Transient
+  private Integer age;
 
   public Student() {
   }
 
-  public Student(String name, int age, String email, LocalDate dob) {
+  public Student(String name, String email, LocalDate dob) {
     this.name = name;
-    this.age = age;
     this.email = email;
     this.dob = dob;
   }
 
-  public Student(long id, String name, int age, String email, LocalDate dob) {
+  public Student(long id, String name, String email, LocalDate dob) {
     this.id = id;
     this.name = name;
-    this.age = age;
     this.email = email;
     this.dob = dob;
   }
@@ -50,7 +56,7 @@ public class Student {
   }
 
   public int getAge() {
-    return age;
+    return Period.between(this.dob, LocalDate.now()).getYears();
   }
 
   public void setAge(int age) {
@@ -75,7 +81,7 @@ public class Student {
 
   @Override
   public String toString() {
-    return "Student{" +
+    return "Student {" +
       "id=" + id +
       ", name='" + name + '\'' +
       ", age=" + age +

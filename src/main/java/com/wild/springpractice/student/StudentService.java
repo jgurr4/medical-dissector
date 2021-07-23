@@ -19,8 +19,14 @@ public class StudentService {
     return studentRepository.findAll();
   }
 
+  public String saveStudent(Student student) {
+    return studentRepository.save(student).getName() == student.getName() ? "success" : "failure";
+  }
+
   public String saveStudents(List<Student> students) {
-    return studentRepository.saveAll(students).size() == students.size() ? "success" : "failure";
+    final List<Student> savedList = studentRepository.saveAll(students);
+    System.out.println(savedList);
+    return savedList.size() == students.size() ? "success" : "failure";
   }
 
 }

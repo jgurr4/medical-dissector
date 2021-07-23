@@ -5,6 +5,7 @@ import com.wild.springpractice.student.Student;
 import com.wild.springpractice.student.StudentRepository;
 import com.wild.springpractice.student.StudentService;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.manipulation.Ordering;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -27,10 +28,14 @@ class SpringPracticeTests {
 
   @Test
   public void getStudentsTest() {
+    Boolean returnedList = true;
     StudentService studentService = new StudentService(studentRepository);
     final List<Student> students = studentService.getStudents();
     System.out.println(students);
-    assertEquals(true, students.isEmpty());
+    if (students == null) {
+      returnedList = false;
+    }
+    assertEquals(true, returnedList);
   }
 
   @Test
@@ -41,8 +46,8 @@ class SpringPracticeTests {
   public void saveStudentsTest() {
     StudentService studentService = new StudentService(studentRepository);
     List<Student> students = List.of(
-      new Student(1, "john", 24, "john@mail.com", LocalDate.of(2002, Month.JANUARY, 2)),
-      new Student(2, "mary", 27, "mary@mail.com", LocalDate.of(1994, Month.APRIL, 5)));
+      new Student("john", "john@mail.com", LocalDate.of(2002, Month.JANUARY, 2)),
+      new Student("mary", "mary@mail.com", LocalDate.of(1994, Month.APRIL, 5)));
     assertEquals("success", studentService.saveStudents(students));
   }
 
