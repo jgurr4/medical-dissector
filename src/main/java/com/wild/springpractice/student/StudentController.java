@@ -15,7 +15,7 @@ public class StudentController {
     this.studentService = studentService;
   }
 
-  @GetMapping      //Since we use this here, it is not required to put method = RequestMethod.GET in @RequestMapping.
+  @GetMapping
   public List<Student> getStudents() {
     return studentService.getStudents();
   }
