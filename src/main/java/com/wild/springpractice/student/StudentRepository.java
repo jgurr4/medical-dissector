@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Long> {
-  // Because it extends JpaRepository, it already has basic CRUD methods.
+  // Because it extends JpaRepository, it already has basic CRUD methods. Alternative is CRUDRepository. But that doesn't use jpa I think.
 }

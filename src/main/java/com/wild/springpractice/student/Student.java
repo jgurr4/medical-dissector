@@ -5,22 +5,22 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.Arrays;
 
-@Entity  // This is for hibernate to create table.
+@Entity
 @Table
 public class Student {
 
   @Id
-  @SequenceGenerator(
-    name = "student_sequence",
-    sequenceName = "student_sequence",
-    allocationSize = 1)
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "student_sequence")
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
   private String name;
   private String email;
   private LocalDate dob;
-  // This tells spring boot that we don't need to construct a age column because we will calculate it based on dob instead.
-  @Transient
+// This tells spring boot that we don't need to construct a age column because we will calculate it based on dob instead.
+//  (Use this option if you want java to calculate age.)
+//  @Transient
+// This tells spring boot that we do want to construct an age column, but it will be generated based on date of birth.
+// (Use this option if you want mysql to store it in db and calculate it.)
+@Column(name="age", columnDefinition = "tinyint generated always as (year(now()) - year(dob))")
   private Integer age;
 
   public Student() {

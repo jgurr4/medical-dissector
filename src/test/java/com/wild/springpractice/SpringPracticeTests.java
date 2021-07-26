@@ -9,6 +9,9 @@ import org.junit.runner.manipulation.Ordering;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
@@ -29,6 +32,13 @@ class SpringPracticeTests {
   @Test
   public void getStudentsTest() {
     Boolean returnedList = true;
+//    test mysql stuff here:
+    Student student = new Student();
+    EntityManagerFactory emf = Persistence.createEntityManagerFactory("test1");
+    EntityManager em = emf.createEntityManager();
+    em.createNativeQuery("SELECT * FROM student");
+    em.persist(student);
+
     StudentService studentService = new StudentService(studentRepository);
     final List<Student> students = studentService.getStudents();
     System.out.println(students);
