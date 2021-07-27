@@ -96,7 +96,8 @@ class SpringPracticeTests {
     StudentService studentService = new StudentService(studentRepository);
     try {
       studentService.removeStudent(email);
-    } catch (Exception err){ }
+    } catch (Exception err) {
+    }
     final Optional<Student> student = studentService.getStudent(email);
     if (student.isPresent()) {
       testFailed = true;

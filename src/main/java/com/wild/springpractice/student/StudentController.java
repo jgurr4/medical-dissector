@@ -16,14 +16,18 @@ public class StudentController {
   }
 
   @GetMapping
-  public List<Student> getStudents() {
-    return studentService.getStudent();
-  }
+  public List<Student> getStudents() { return studentService.getStudent(); }
 
   @PostMapping
   public void registerNewStudent(@RequestBody Student student) {
     studentService.saveStudent(student);
   }
+
+  @PutMapping
+  public void updateStudent(@RequestBody Student student) { studentService.updateStudent(student);}
+
+  @DeleteMapping
+  public void deleteStudent(@RequestBody Student student) { studentService.removeStudent(student);}
 
 }
 // @RequestParam is a useful way to set a default value in case a parameter is not given. Example:

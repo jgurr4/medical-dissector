@@ -1,0 +1,6 @@
+<persistence>
+    <class>com.wild.springpractice</class>
+    <persistence-unit name="test1">
+
+    </persistence-unit>
+</persistence>

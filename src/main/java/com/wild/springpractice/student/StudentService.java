@@ -33,13 +33,20 @@ public class StudentService {
     studentRepository.save(student);
   }
 
+  public void updateStudent(Student newStudent) { //FIXME: Currently, this will not allow you to update email at same time.
+    final Long id = studentRepository.findStudentByEmail(newStudent.getEmail()).get().getId();
+    newStudent = new Student(id, newStudent.getName(), newStudent.getEmail(), newStudent.getDob());
+    studentRepository.save(newStudent);
+  }
+
+  public void removeStudent(Student student) {
+    final Optional<Student> foundStudent = studentRepository.findStudentByEmail(student.getEmail());
+    studentRepository.delete(foundStudent.get());
+  }
+
   public void removeStudent(String email) {
     final Optional<Student> student = studentRepository.findStudentByEmail(email);
     studentRepository.delete(student.get());
-  }
-
-  public void updateStudent(Student newStudent) {
-    studentRepository.save(newStudent);
   }
 
 }
