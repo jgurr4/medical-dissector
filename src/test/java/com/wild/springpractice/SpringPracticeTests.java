@@ -16,8 +16,7 @@ import java.time.Month;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest
@@ -64,6 +63,21 @@ class SpringPracticeTests {
       returnedList = false;
     }
     assertTrue(returnedList);
+  }
+
+  @Test
+  public void removeStudentSuccess() {
+    Boolean testFailed = false;
+    final String email = "john@mail.com";
+    StudentService studentService = new StudentService(studentRepository);
+    try {
+      studentService.removeStudent(email);
+    } catch (Exception err){ }
+    final Optional<Student> student = studentService.getStudent(email);
+    if (student.isPresent()) {
+      testFailed = true;
+    }
+    assertFalse(testFailed);
   }
 
   @Test

@@ -32,10 +32,9 @@ public class StudentService {
     studentRepository.save(student);
   }
 
-  public String saveStudents(List<Student> students) {
-    final List<Student> savedList = studentRepository.saveAll(students);
-    System.out.println(savedList);
-    return savedList.size() == students.size() ? "success" : "failure";
+  public void removeStudent(String email) {
+    final Optional<Student> student = studentRepository.findStudentByEmail(email);
+    studentRepository.delete(student.get());
   }
 
 }
