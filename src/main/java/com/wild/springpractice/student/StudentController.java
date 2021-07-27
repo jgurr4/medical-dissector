@@ -20,11 +20,15 @@ public class StudentController {
 
   @PostMapping
   public void registerNewStudent(@RequestBody Student student) {
-    studentService.saveStudent(student);
+    studentService.registerStudent(student);
   }
 
-  @PutMapping
-  public void updateStudent(@RequestBody Student student) { studentService.updateStudent(student);}
+  @PutMapping(path = "{studentId}")
+  public void updateStudent(@PathVariable("studentId") Long studentId,
+                            @RequestParam(required = false) String name,
+                            @RequestParam(required = false) String email,
+                            @RequestParam(required = false) String dob) {
+    studentService.updateStudent(studentId, name, email, dob);}
 
   @DeleteMapping(path = "{studentId}")
   public void deleteStudent(@PathVariable("studentId") Long studentId) { studentService.removeStudent(studentId);}

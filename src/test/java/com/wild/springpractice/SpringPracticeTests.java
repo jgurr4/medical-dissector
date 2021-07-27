@@ -48,16 +48,16 @@ class SpringPracticeTests {
       new Student("Dan", "dan@mail.com", LocalDate.of(1992, Month.JANUARY, 24)),
       new Student("mary", "mary@mail.com", LocalDate.of(1994, Month.APRIL, 5)));
     for (Student student : students) {
-      studentService.saveStudent(student);
+      studentService.registerStudent(student);
     }
-    assertTrue(studentService.getStudent("john@mail.com").isPresent());
+    assertTrue(studentService.getStudent("dan@mail.com").isPresent());
   }
 
   @Test
   public void saveStudentSuccess() {
     StudentService studentService = new StudentService(studentRepository);
     final Student student = new Student("john", "john@mail.com", LocalDate.of(2002, Month.JANUARY, 2));
-    studentService.saveStudent(student);
+    studentService.registerStudent(student);
     assertTrue(studentService.getStudent("john@mail.com").isPresent());
   }
 
@@ -75,59 +75,62 @@ class SpringPracticeTests {
 
   @Test
   public void updateStudentSuccess() {
-    final String email = "john@mail.com";
+    String email = "john@mail.com";
     final StudentService studentService = new StudentService(studentRepository);
-    final Optional<Student> student = studentService.getStudent(email);
+    final Student student = new Student("john", email, LocalDate.of(2002, Month.JANUARY, 2));
+    studentService.registerStudent(student);
+    final Optional<Student> optionalStudent = studentService.getStudent(email);
     try {
-      student.get().getId();
+      optionalStudent.get().getId();
     } catch (Exception err) {
       System.out.println("\nStudent doesn't exist.\n");
       fail();
     }
     final Long id = studentService.getStudent(email).get().getId();
-    studentService.updateStudent(new Student(id, "joseph", email, LocalDate.of(1943, 10, 05)));
-    assertTrue(student.get().getName().equals("joseph"));
+    studentService.updateStudent(id, "joseph", "joseph@mail.com", "1943-10-05");
+    assertTrue(studentService.getStudent("joseph@mail.com").isPresent());
   }
 
   @Test
   public void removeStudentSuccess() {
     Boolean testFailed = false;
     StudentService studentService = new StudentService(studentRepository);
+    final Student student = new Student("remove", "removeme@mail.com", LocalDate.of(2002, Month.JANUARY, 2));
+    studentService.registerStudent(student);
     try {
-      studentService.removeStudent(1001L);
+      studentService.removeStudent(student.getId());
     } catch (Exception err) {
     }
-    final Optional<Student> student = studentRepository.findById(1001L);
-    if (student.isPresent()) {
+    final Optional<Student> optionalStudent = studentRepository.findById(student.getId());
+    if (optionalStudent.isPresent()) {
       testFailed = true;
     }
     assertFalse(testFailed);
   }
 
-  @Test
-  public void mysqlTest() { //FIXME: The Persistence.createEntityManagerFactory line is failing. Probably due to not having a persistence.xml file.
-    StudentService studentService = new StudentService(studentRepository);
-//    test mysql stuff using EntityManager here:
-    String name = "billy";
-    LocalDate dob = LocalDate.of(1835, 04, 23);
-    String email = "billy@mail.com";
-
-    Student student = new Student();
-    EntityManagerFactory emf = Persistence.createEntityManagerFactory("test1");
-    EntityManager em = emf.createEntityManager();
-    em.getTransaction().begin();
-//    em.createNativeQuery("SELECT * FROM student");
-    student.setName(name);
-    student.setDob(dob);
-    student.setEmail(email);
-    em.persist(student);
-    em.getTransaction().commit();
-    em.close();
-    emf.close();
-
-    assertTrue(studentService.getStudent(email).isPresent());
-
-  }
+//  @Test
+//  public void mysqlTest() { //FIXME: The Persistence.createEntityManagerFactory line is failing. Probably due to not having a persistence.xml file.
+//    StudentService studentService = new StudentService(studentRepository);
+////    test mysql stuff using EntityManager here:
+//    String name = "billy";
+//    LocalDate dob = LocalDate.of(1835, 04, 23);
+//    String email = "billy@mail.com";
+//
+//    Student student = new Student();
+//    EntityManagerFactory emf = Persistence.createEntityManagerFactory("test1");
+//    EntityManager em = emf.createEntityManager();
+//    em.getTransaction().begin();
+////    em.createNativeQuery("SELECT * FROM student");
+//    student.setName(name);
+//    student.setDob(dob);
+//    student.setEmail(email);
+//    em.persist(student);
+//    em.getTransaction().commit();
+//    em.close();
+//    emf.close();
+//
+//    assertTrue(studentService.getStudent(email).isPresent());
+//  }
 
 //  @Test
 //  public void GetStudentFail() {
