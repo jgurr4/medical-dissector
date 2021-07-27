@@ -7,20 +7,15 @@ import java.util.Arrays;
 
 @Entity
 @Table
-public class Student {
+public class Student {  // This is a POJO or Plain Old Java Object. It is the model for our repository.
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.AUTO)  // TODO: Find a way to make mysql auto-increment instead of java. Because it's simpler if mysql handles it.
   private Long id;
   private String name;
   private String email;
   private LocalDate dob;
-// This tells spring boot that we don't need to construct a age column because we will calculate it based on dob instead.
-//  (Use this option if you want java to calculate age.)
-//  @Transient
-// This tells spring boot that we do want to construct an age column, but it will be generated based on date of birth.
-// (Use this option if you want mysql to store it in db and calculate it.)
-@Column(name="age", columnDefinition = "tinyint generated always as (year(now()) - year(dob))")
+  @Column(name="age", columnDefinition = "tinyint generated always as (year(now()) - year(dob))")
   private Integer age;
 
   public Student() {
