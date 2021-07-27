@@ -45,11 +45,19 @@ class SpringPracticeTests {
   public void saveStudentsSuccess() {
     StudentService studentService = new StudentService(studentRepository);
     List<Student> students = List.of(
-      new Student("john", "john@mail.com", LocalDate.of(2002, Month.JANUARY, 2)),
+      new Student("Dan", "dan@mail.com", LocalDate.of(1992, Month.JANUARY, 24)),
       new Student("mary", "mary@mail.com", LocalDate.of(1994, Month.APRIL, 5)));
     for (Student student : students) {
       studentService.saveStudent(student);
     }
+    assertTrue(studentService.getStudent("john@mail.com").isPresent());
+  }
+
+  @Test
+  public void saveStudentSuccess() {
+    StudentService studentService = new StudentService(studentRepository);
+    final Student student = new Student("john", "john@mail.com", LocalDate.of(2002, Month.JANUARY, 2));
+    studentService.saveStudent(student);
     assertTrue(studentService.getStudent("john@mail.com").isPresent());
   }
 
@@ -63,6 +71,22 @@ class SpringPracticeTests {
       returnedList = false;
     }
     assertTrue(returnedList);
+  }
+
+  @Test
+  public void updateStudentSuccess() {
+    final String email = "john@mail.com";
+    final StudentService studentService = new StudentService(studentRepository);
+    final Optional<Student> student = studentService.getStudent(email);
+    try {
+      student.get().getId();
+    } catch (Exception err) {
+      System.out.println("\nStudent doesn't exist.\n");
+      fail();
+    }
+    final Long id = studentService.getStudent(email).get().getId();
+    studentService.updateStudent(new Student(id, "joseph", email, LocalDate.of(1943, 10, 05)));
+    assertTrue(student.get().getName().equals("joseph"));
   }
 
   @Test
