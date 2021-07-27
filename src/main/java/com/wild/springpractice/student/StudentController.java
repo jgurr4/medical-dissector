@@ -26,8 +26,8 @@ public class StudentController {
   @PutMapping
   public void updateStudent(@RequestBody Student student) { studentService.updateStudent(student);}
 
-  @DeleteMapping
-  public void deleteStudent(@RequestBody Student student) { studentService.removeStudent(student);}
+  @DeleteMapping(path = "{studentId}")
+  public void deleteStudent(@PathVariable("studentId") Long studentId) { studentService.removeStudent(studentId);}
 
 }
 // @RequestParam is a useful way to set a default value in case a parameter is not given. Example:

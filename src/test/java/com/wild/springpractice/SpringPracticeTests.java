@@ -92,13 +92,12 @@ class SpringPracticeTests {
   @Test
   public void removeStudentSuccess() {
     Boolean testFailed = false;
-    final String email = "john@mail.com";
     StudentService studentService = new StudentService(studentRepository);
     try {
-      studentService.removeStudent(email);
+      studentService.removeStudent(1001L);
     } catch (Exception err) {
     }
-    final Optional<Student> student = studentService.getStudent(email);
+    final Optional<Student> student = studentRepository.findById(1001L);
     if (student.isPresent()) {
       testFailed = true;
     }

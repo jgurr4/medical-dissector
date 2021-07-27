@@ -32,21 +32,21 @@ public class StudentService {
     }
     studentRepository.save(student);
   }
-
-  public void updateStudent(Student newStudent) { //FIXME: Currently, this will not allow you to update email at same time.
-    final Long id = studentRepository.findStudentByEmail(newStudent.getEmail()).get().getId();
-    newStudent = new Student(id, newStudent.getName(), newStudent.getEmail(), newStudent.getDob());
+  //FIXME: Currently, this will not allow you to update email at same time. probably best solution would be to change http request to different path, and make the content-type something else maybe.
+  public void updateStudent(Student newStudent) {
+    final boolean exists = studentRepository.existsById(newStudent.getId());
+    if (!exists) {
+      throw new IllegalStateException("Student with id " + newStudent.getId() + " does not exist.");
+    }
     studentRepository.save(newStudent);
   }
 
-  public void removeStudent(Student student) {
-    final Optional<Student> foundStudent = studentRepository.findStudentByEmail(student.getEmail());
-    studentRepository.delete(foundStudent.get());
-  }
-
-  public void removeStudent(String email) {
-    final Optional<Student> student = studentRepository.findStudentByEmail(email);
-    studentRepository.delete(student.get());
+  public void removeStudent(Long studentId) {
+    final boolean exists = studentRepository.existsById(studentId);
+    if (!exists) {
+      throw new IllegalStateException("Student with id " + studentId + " does not exist.");
+    }
+    studentRepository.deleteById(studentId);
   }
 
 }
