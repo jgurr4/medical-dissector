@@ -1,4 +1,4 @@
-This Spring-boot app is designed using these principles/features: 
+### Design Principles
 * An inversion of control pattern mostly done with dependency injection. (since inversion of control is central to Spring Framework design)
 * RESTful api.
 * MVC (Model View Controller) design pattern.

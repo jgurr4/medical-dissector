@@ -2,15 +2,13 @@ package com.wild.springpractice.student;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.Period;
-import java.util.Arrays;
 
 @Entity
 @Table
-public class Student {  // This is a POJO or Plain Old Java Object. It is the model for our repository.
+public class Student {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)  // TODO: Find a way to make mysql auto-increment instead of java. Because it's simpler if mysql handles it.
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
   private String name;
   private String email;
@@ -51,7 +49,7 @@ public class Student {  // This is a POJO or Plain Old Java Object. It is the mo
   }
 
   public int getAge() {
-    return Period.between(this.dob, LocalDate.now()).getYears();
+    return age;
   }
 
   public void setAge(int age) {

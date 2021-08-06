@@ -4,13 +4,20 @@ package com.wild.springpractice;
 import com.wild.springpractice.student.Student;
 import com.wild.springpractice.student.StudentRepository;
 import com.wild.springpractice.student.StudentService;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.Authenticator;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
@@ -29,6 +36,26 @@ class SpringPracticeTests {
     this.studentRepository = studentRepository;
   }
 
+  @BeforeAll
+  @Test
+  public static void checkMariadb() {
+    StringBuffer output = new StringBuffer();
+    Process p;
+    try {
+      p = Runtime.getRuntime().exec("docker ps");
+      p.waitFor();
+      BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+      String line = "";
+      while ((line = reader.readLine()) != null) {
+        output.append(line + "\n");
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    System.out.println(output);
+    assertTrue(output.toString().contains("mariadb"));
+  }
+
   @Test
   public void getStudentsTest() {
     Boolean returnedList = true;
@@ -42,7 +69,7 @@ class SpringPracticeTests {
   }
 
   @Test
-  public void saveStudentsSuccess() {
+  public void registerStudentsSuccess() {
     StudentService studentService = new StudentService(studentRepository);
     List<Student> students = List.of(
       new Student("Dan", "dan@mail.com", LocalDate.of(1992, Month.JANUARY, 24)),
@@ -54,7 +81,7 @@ class SpringPracticeTests {
   }
 
   @Test
-  public void saveStudentSuccess() {
+  public void registerStudentSuccess() {
     StudentService studentService = new StudentService(studentRepository);
     final Student student = new Student("john", "john@mail.com", LocalDate.of(2002, Month.JANUARY, 2));
     studentService.registerStudent(student);
@@ -108,8 +135,41 @@ class SpringPracticeTests {
     assertFalse(testFailed);
   }
 
+  @Test
+  public void customMysqlQueryTest() {
+
+  }
+
+/* //FIXME: This is a good test for normal Java, but in spring it won't work due to the fact spring tests require very special handling, especially due to spring dependency injection preventing normal unit and integration tests from working.
+  @Test   // Source: https://examples.javacodegeeks.com/core-java/java-11-standardized-http-client-api-example/
+  public void httpPostTest() throws IOException, InterruptedException {
+    HttpClient client = HttpClient.newHttpClient();
+    HttpRequest request = HttpRequest.newBuilder()
+      .uri(URI.create("http://localhost:8080/api/student"))
+      .timeout(Duration.ofSeconds(15))
+      .header("Content-Type", "application/json")
+      .POST(HttpRequest.BodyPublishers.ofString("name=betsy&email=betsy@mail.com&dob=1992-08-06"))  // HttpRequest.BodyPublishers.ofFile(Paths.get("file.json")) This is how to get from a file instead of string.
+      .build();
+    HttpResponse response = client.send(request, HttpResponse.BodyHandlers.discarding());
+    assertTrue(response.statusCode() == 201, "Status Code is not Created");
+  }
+
+
+  @Test
+    public void httpGetTest() {
+    HttpClient client = HttpClient.newBuilder()
+      .version(HttpClient.Version.HTTP_2)
+      .followRedirects(HttpClient.Redirect.NORMAL)
+      .connectTimeout(Duration.ofSeconds(10))
+//      .proxy(ProxySelector.of(new InetSocketAddress("www-proxy.com", 8080)))
+      .authenticator(Authenticator.getDefault())
+      .build();
+  }
+*/
+
+// This is only if you are using the persistence.xml, which this project doesn't use.
 //  @Test
-//  public void mysqlTest() { //FIXME: The Persistence.createEntityManagerFactory line is failing. Probably due to not having a persistence.xml file.
+//  public void mysqlTest() {
 //    StudentService studentService = new StudentService(studentRepository);
 ////    test mysql stuff using EntityManager here:
 //    String name = "billy";
