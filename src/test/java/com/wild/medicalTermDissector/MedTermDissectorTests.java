@@ -1,23 +1,16 @@
-package com.wild.springpractice;
+package com.wild.medicalTermDissector;
 
 
-import com.wild.springpractice.student.Student;
-import com.wild.springpractice.student.StudentRepository;
-import com.wild.springpractice.student.StudentService;
+import com.wild.medicalTermDissector.medicalTerms.MedTerm;
+import com.wild.medicalTermDissector.medicalTerms.MedTermRepository;
+import com.wild.medicalTermDissector.medicalTerms.MedTermService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.Authenticator;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
@@ -27,13 +20,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest
-class SpringPracticeTests {
+class MedTermDissectorTests {
 
-  private final StudentRepository studentRepository;
+  private final MedTermRepository medTermRepository;
 
   @Autowired
-  SpringPracticeTests(StudentRepository studentRepository) {
-    this.studentRepository = studentRepository;
+  MedTermDissectorTests(MedTermRepository medTermRepository) {
+    this.medTermRepository = medTermRepository;
   }
 
   @BeforeAll
@@ -57,41 +50,42 @@ class SpringPracticeTests {
   }
 
   @Test
-  public void getStudentsTest() {
+  public void getMedTermsTest() {
     Boolean returnedList = true;
-    StudentService studentService = new StudentService(studentRepository);
-    final List<Student> students = studentService.getStudent();
-    System.out.println("\n" + students + "\n");
-    if (students == null) {
+    MedTermService medTermService = new MedTermService(medTermRepository);
+    final List<MedTerm> medTerms = medTermService.getMedTerm();
+    System.out.println("\n" + medTerms + "\n");
+    if (medTerms == null) {
       returnedList = false;
     }
     assertTrue(returnedList);
   }
 
   @Test
-  public void registerStudentsSuccess() {
-    StudentService studentService = new StudentService(studentRepository);
-    List<Student> students = List.of(
-      new Student("Dan", "dan@mail.com", LocalDate.of(1992, Month.JANUARY, 24)),
-      new Student("mary", "mary@mail.com", LocalDate.of(1994, Month.APRIL, 5)));
-    for (Student student : students) {
-      studentService.registerStudent(student);
+  public void addMedTermsSuccess() {
+    MedTermService medTermService = new MedTermService(medTermRepository);
+    List<MedTerm> medTerms = List.of(
+      new MedTerm("hyperventilation", "abnormally rapid breathing"),
+      new MedTerm("hypertrophy", "increase in the size of an organ due to an increase in the size of its cells"));
+    for (MedTerm medTerm : medTerms) {
+      medTermService.addMedTerm(medTerm);
     }
-    assertTrue(studentService.getStudent("dan@mail.com").isPresent());
+    assertTrue(medTermService.getMedTerm("hyperventilation").isPresent());
   }
 
   @Test
-  public void registerStudentSuccess() {
-    StudentService studentService = new StudentService(studentRepository);
-    final Student student = new Student("john", "john@mail.com", LocalDate.of(2002, Month.JANUARY, 2));
-    studentService.registerStudent(student);
-    assertTrue(studentService.getStudent("john@mail.com").isPresent());
+  public void addMedTermSuccess() {
+    MedTermService medTermService = new MedTermService(medTermRepository);
+    final MedTerm medTerm = new MedTerm("hyperplasia", "the enlargement of an organ or tissue ");
+    medTermService.addMedTerm(medTerm);
+    assertTrue(medTermService.getMedTerm("hyperplasia").isPresent());
   }
 
+/* no longer needed for medical terms. May replace with something else.
   @Test
   public void getStudentByEmailSuccess() {
     Boolean returnedList = true;
-    StudentService studentService = new StudentService(studentRepository);
+    StudentService studentService = new StudentService(medTermRepository);
     final Optional<Student> student = studentService.getStudent("john@mail.com");
     System.out.println("\n" + student + "\n");
     if (student == null) {
@@ -99,37 +93,38 @@ class SpringPracticeTests {
     }
     assertTrue(returnedList);
   }
+*/
 
   @Test
-  public void updateStudentSuccess() {
-    String email = "john@mail.com";
-    final StudentService studentService = new StudentService(studentRepository);
-    final Student student = new Student("john", email, LocalDate.of(2002, Month.JANUARY, 2));
-    studentService.registerStudent(student);
-    final Optional<Student> optionalStudent = studentService.getStudent(email);
+  public void updateMedTermSuccess() {
+    String name = "hypoglycemia";
+    final MedTermService medTermService = new MedTermService(medTermRepository);
+    final MedTerm medTerm = new MedTerm(name, "below normal levels of sugar in blood.");
+    medTermService.addMedTerm(medTerm);
+    final Optional<MedTerm> optionalMedTerm = medTermService.getMedTerm(name);
     try {
-      optionalStudent.get().getId();
+      optionalMedTerm.get().getId();
     } catch (Exception err) {
-      System.out.println("\nStudent doesn't exist.\n");
+      System.out.println("\nMedical term doesn't exist.\n");
       fail();
     }
-    final Long id = studentService.getStudent(email).get().getId();
-    studentService.updateStudent(id, "joseph", "joseph@mail.com", "1943-10-05");
-    assertTrue(studentService.getStudent("joseph@mail.com").isPresent());
+    final Long termId = medTermService.getMedTerm(name).get().getId();
+    medTermService.updateMedTerm(termId, name, "Lack of sugar in blood");
+    assertTrue(medTermService.getMedTerm(name).isPresent());
   }
 
   @Test
-  public void removeStudentSuccess() {
+  public void deleteMedTermSuccess() {
     Boolean testFailed = false;
-    StudentService studentService = new StudentService(studentRepository);
-    final Student student = new Student("remove", "removeme@mail.com", LocalDate.of(2002, Month.JANUARY, 2));
-    studentService.registerStudent(student);
+    MedTermService medTermService = new MedTermService(medTermRepository);
+    final MedTerm medTerm = new MedTerm("removeme", "This term must be removed.");
+    medTermService.addMedTerm(medTerm);
     try {
-      studentService.removeStudent(student.getId());
+      medTermService.deleteMedTerm(medTerm.getId());
     } catch (Exception err) {
     }
-    final Optional<Student> optionalStudent = studentRepository.findById(student.getId());
-    if (optionalStudent.isPresent()) {
+    final Optional<MedTerm> optionalMedTerm = medTermRepository.findById(medTerm.getId());
+    if (optionalMedTerm.isPresent()) {
       testFailed = true;
     }
     assertFalse(testFailed);

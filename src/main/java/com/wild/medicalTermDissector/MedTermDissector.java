@@ -1,4 +1,4 @@
-package com.wild.springpractice;
+package com.wild.medicalTermDissector;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,10 +14,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 
 @SpringBootApplication
-public class SpringPractice {
+public class MedTermDissector {
 
   public static void main(String[] args) {
-    SpringApplication.run(SpringPractice.class, args);
+    SpringApplication.run(MedTermDissector.class, args);
   }
 
   @Configuration

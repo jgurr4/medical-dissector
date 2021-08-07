@@ -4,4 +4,4 @@
 // Also, instead of using this page, you can just click on any mapping and click
 // "open in http client"
 
-GET http://localhost:8080/api/student
+GET http://localhost:8080/api/medTerm

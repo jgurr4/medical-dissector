@@ -1,17 +1,15 @@
-package com.wild.springpractice.student;
+package com.wild.medicalTermDissector.medicalTerms;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface StudentRepository extends JpaRepository<Student, Long> {
+public interface MedTermRepository extends JpaRepository<MedTerm, Long> {
   // Because it extends JpaRepository, it already has basic CRUD methods. Alternative is CRUDRepository. But that doesn't use jpa I think.
-//  @Query("SELECT s FROM Student s WHERE s.email = ?1")    // This is JBQL not normal SQL. This is what the code below will run.
-  Optional<Student> findStudentByEmail(String email);
+//  @Query("SELECT m FROM medterm m WHERE m.name = ?1")    // This is JBQL not normal SQL. This is what the code below will run.
+  Optional<MedTerm> findByName(String name);
 
 // This is how you create custom sql queries with jpa. sometimes this part isn't required like above. Also value isn't required either.
 // You define the query on top, then you state the return object and the method name and params if any below.
