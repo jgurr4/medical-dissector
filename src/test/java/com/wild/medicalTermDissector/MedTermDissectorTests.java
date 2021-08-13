@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.event.annotation.BeforeTestMethod;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -54,7 +55,7 @@ class MedTermDissectorTests {
     Boolean returnedList = true;
     MedTermService medTermService = new MedTermService(medTermRepository);
     final List<MedTerm> medTerms = medTermService.getMedTerm();
-    System.out.println("\n" + medTerms + "\n");
+//    System.out.println("\n" + medTerms + "\n");
     if (medTerms == null) {
       returnedList = false;
     }
@@ -79,6 +80,16 @@ class MedTermDissectorTests {
     final MedTerm medTerm = new MedTerm("hyperplasia", "the enlargement of an organ or tissue ");
     medTermService.addMedTerm(medTerm);
     assertTrue(medTermService.getMedTerm("hyperplasia").isPresent());
+  }
+
+  @Test
+  public void findByNameStartsWithSuccess() {
+    MedTermService medTermService = new MedTermService(medTermRepository);
+    final MedTerm medTerm = new MedTerm("hyperstasis", "something here");
+    medTermService.addMedTerm(medTerm);
+    final List<MedTerm> medTermsList = medTermService.getMedTerms("hy");
+//    System.out.println("\n" + medTermsList + "\n");
+    assertFalse(medTermsList.isEmpty());
   }
 
 /* no longer needed for medical terms. May replace with something else.

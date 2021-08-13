@@ -51,4 +51,9 @@ public class MedTermService {
     medTermRepository.deleteById(termId);
   }
 
+  public List<MedTerm> getMedTerms(String letters) {
+    letters += "%";
+    return medTermRepository.findByNameStartsWith(letters);
+  }
+
 }

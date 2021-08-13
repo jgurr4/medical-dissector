@@ -1,5 +1,6 @@
 package com.wild.medicalTermDissector.medicalTerms;
 
+
 import javax.persistence.*;
 import java.time.LocalDate;
 

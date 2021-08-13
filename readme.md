@@ -18,3 +18,8 @@ So based on this, you can understand that hypoglycemia means "lacking sugar in t
 * Mariadb for relational database.
 * rxjava3 to run as many things reactively as possible.
 * email client and OAuth2 to send emails for login reset.
+
+
+### Setup
+First, run the setup.sql script in mariadb container by either copying the contents to mysql client, or by linking file
+to the location of scripts folder for container.

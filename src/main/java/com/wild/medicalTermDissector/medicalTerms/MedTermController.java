@@ -18,6 +18,11 @@ public class MedTermController {
   @GetMapping
   public List<MedTerm> getMedTerms() { return medTermService.getMedTerm(); }
 
+  @GetMapping(path = "{letters}")
+  public List<MedTerm> getMedTerms(@PathVariable("letters") String letters) {
+    return medTermService.getMedTerms(letters);
+  }
+
   @PostMapping
   public void addNewMedTerm(@RequestBody MedTerm medTerm) {
     medTermService.addMedTerm(medTerm);
