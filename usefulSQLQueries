@@ -1,0 +1,3 @@
+select * from affix where match examples against ('abdominal')\G  // Fulltext search on examples column.
+select * from affix where affix like '%hyper%'\G                 // Find the affix in affix column
+select * from affix where affix regexp "\\([a-z]\\)"\G           //Find all the affixes which contain optional parentheses letter like (o) or (i) etc...

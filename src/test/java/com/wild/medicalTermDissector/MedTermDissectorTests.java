@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -92,20 +93,6 @@ class MedTermDissectorTests {
     assertFalse(medTermsList.isEmpty());
   }
 
-/* no longer needed for medical terms. May replace with something else.
-  @Test
-  public void getStudentByEmailSuccess() {
-    Boolean returnedList = true;
-    StudentService studentService = new StudentService(medTermRepository);
-    final Optional<Student> student = studentService.getStudent("john@mail.com");
-    System.out.println("\n" + student + "\n");
-    if (student == null) {
-      returnedList = false;
-    }
-    assertTrue(returnedList);
-  }
-*/
-
   @Test
   public void updateMedTermSuccess() {
     String name = "hypoglycemia";
@@ -127,7 +114,7 @@ class MedTermDissectorTests {
   @Test
   public void deleteMedTermSuccess() {
     Boolean testFailed = false;
-    MedTermService medTermService = new MedTermService(medTermRepository);
+    final MedTermService medTermService = new MedTermService(medTermRepository);
     final MedTerm medTerm = new MedTerm("removeme", "This term must be removed.");
     medTermService.addMedTerm(medTerm);
     try {
@@ -142,9 +129,20 @@ class MedTermDissectorTests {
   }
 
   @Test
+  public void dissectTermSuccess() {
+    final MedTermService medTermService = new MedTermService(medTermRepository);
+    final Map<String, String> dissect = medTermService.dissect("hypoglycemia");
+    assertEquals("lack of", dissect.get("hypo-"));
+    assertEquals("sugar", dissect.get("glyc-"));
+    assertEquals("blood", dissect.get("-emia"));
+  }
+
+/*
+  @Test
   public void customMysqlQueryTest() {
 
   }
+*/
 
 /* //FIXME: This is a good test for normal Java, but in spring it won't work due to the fact spring tests require very special handling, especially due to spring dependency injection preventing normal unit and integration tests from working.
   @Test   // Source: https://examples.javacodegeeks.com/core-java/java-11-standardized-http-client-api-example/

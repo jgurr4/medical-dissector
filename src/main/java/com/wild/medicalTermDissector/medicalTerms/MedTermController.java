@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "/api/term")
@@ -21,6 +22,11 @@ public class MedTermController {
   @GetMapping(path = "{letters}")
   public List<MedTerm> getMedTerms(@PathVariable("letters") String letters) {
     return medTermService.getMedTerms(letters);
+  }
+
+  @GetMapping(path = "{term}")
+  public Map<String, String> getDissectedTerm(@PathVariable("term") String term) {
+    return medTermService.dissect(term);
   }
 
   @PostMapping

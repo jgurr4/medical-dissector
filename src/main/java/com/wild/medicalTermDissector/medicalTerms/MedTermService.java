@@ -3,9 +3,7 @@ package com.wild.medicalTermDissector.medicalTerms;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class MedTermService {
@@ -54,6 +52,18 @@ public class MedTermService {
   public List<MedTerm> getMedTerms(String letters) {
     letters += "%";
     return medTermRepository.findByNameStartsWith(letters);
+  }
+
+  public Map<String, String> dissect(String term) {
+    final HashMap<String, String> dissectedParts = new HashMap<>();
+    List<Affix> affix = List.of();
+    for (int i = 0; i < term.length(); i++) {
+      affix = medTermRepository.findByAffixStartsWith("%" + term.substring(0, i) + "%");
+      if (affix.size() == 1) {
+        dissectedParts.put(term.substring(0, i), affix.get(0).getMeaning());
+      }
+    }
+    return null;
   }
 
 }

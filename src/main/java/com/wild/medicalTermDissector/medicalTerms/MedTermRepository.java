@@ -12,8 +12,13 @@ public interface MedTermRepository extends JpaRepository<MedTerm, Long> {
 //  @Query("SELECT m FROM medterm m WHERE m.name = ?1")    // This is JBQL not normal SQL.
   Optional<MedTerm> findByName(String name);
 
-  @Query(value = "select * from med_term where name like ?1", nativeQuery = true)
+  @Query(value = "select * from med_term where name like ?1", nativeQuery = true)   
   List<MedTerm> findByNameStartsWith(String letters);
+// Alternatively use Named parameters like this   where name like :title%
+// Notice how you don't need quotes to add a % symbol here. You can do same thing with numbered parameters, Test this to see if it works by removing the addition of % in medTermService method.
+
+  @Query(value = "select * from presuf where affix like ?1", nativeQuery = true)
+  List<Affix> findByAffixStartsWith(String letters);
 
 //  @Query(value = "", nativeQuery = true)
 //  Optional<MedTerm> searchByName(String name);
