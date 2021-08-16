@@ -57,8 +57,8 @@ public class MedTermService {
   public Map<String, String> dissect(String term) {
     final HashMap<String, String> dissectedParts = new HashMap<>();
     List<Affix> affix = List.of();
-    for (int i = 0; i < term.length(); i++) {
-      affix = medTermRepository.findByAffixStartsWith("%" + term.substring(0, i) + "%");
+    for (int i = 0; i < term.length(); i++) {    // vascul\\(?o\\)?
+      affix = medTermRepository.findByAffixStartsWith(term.substring(0, i-1) + "\\\\(?" + term.substring(i, i+1) + "\\\\)?");
       if (affix.size() == 1) {
         dissectedParts.put(term.substring(0, i), affix.get(0).getMeaning());
       }

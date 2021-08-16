@@ -1,6 +1,7 @@
 package com.wild.medicalTermDissector;
 
 
+import com.wild.medicalTermDissector.medicalTerms.Affix;
 import com.wild.medicalTermDissector.medicalTerms.MedTerm;
 import com.wild.medicalTermDissector.medicalTerms.MedTermRepository;
 import com.wild.medicalTermDissector.medicalTerms.MedTermService;
@@ -135,6 +136,12 @@ class MedTermDissectorTests {
     assertEquals("lack of", dissect.get("hypo-"));
     assertEquals("sugar", dissect.get("glyc-"));
     assertEquals("blood", dissect.get("-emia"));
+  }
+
+  @Test
+  public void findByAffixStartsWithSuccess() {  // hyp\\(?o\\)?  should return hypo- or hyp(o)-
+    List<Affix> affix = medTermRepository.findByAffixStartsWith("hyp" + "\\(?o\\)?");
+    assertEquals("hyp(o)-", affix.get(0).getAffix());
   }
 
 /*

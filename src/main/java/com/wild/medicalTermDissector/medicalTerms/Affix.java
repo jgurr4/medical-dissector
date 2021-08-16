@@ -7,6 +7,8 @@ import javax.persistence.*;
 public class Affix {
 
   @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private int id;
   private String affix;
   private String meaning;
   private String examples;
@@ -14,10 +16,19 @@ public class Affix {
   public Affix() {
   }
 
-  public Affix(String affix, String meaning, String examples) {
+  public Affix(int id, String affix, String meaning, String examples) {
+    this.id = id;
     this.affix = affix;
     this.meaning = meaning;
     this.examples = examples;
+  }
+
+  public int getId() {
+    return id;
+  }
+
+  public void setId(int id) {
+    this.id = id;
   }
 
   public String getAffix() {
@@ -47,6 +58,7 @@ public class Affix {
   @Override
   public String toString() {
     return "Affix{" +
+      "id=" + id +
       "affix='" + affix + '\'' +
       ", meaning='" + meaning + '\'' +
       ", examples='" + examples + '\'' +
