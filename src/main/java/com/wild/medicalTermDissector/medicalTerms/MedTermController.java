@@ -24,7 +24,7 @@ public class MedTermController {
     return medTermService.getMedTerms(letters);
   }
 
-  @GetMapping(path = "{term}")
+  @GetMapping(path = "/dissect/{term}")
   public Map<String, String> getDissectedTerm(@PathVariable("term") String term) {
     return medTermService.dissect(term);
   }

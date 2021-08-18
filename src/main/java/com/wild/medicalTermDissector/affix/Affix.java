@@ -1,4 +1,4 @@
-package com.wild.medicalTermDissector.medicalTerms;
+package com.wild.medicalTermDissector.affix;
 
 import javax.persistence.*;
 
@@ -7,8 +7,7 @@ import javax.persistence.*;
 public class Affix {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private int id;
+  private Integer id;
   private String affix;
   private String meaning;
   private String examples;
@@ -16,18 +15,18 @@ public class Affix {
   public Affix() {
   }
 
-  public Affix(int id, String affix, String meaning, String examples) {
+  public Affix(Integer id, String affix, String meaning, String examples) {
     this.id = id;
     this.affix = affix;
     this.meaning = meaning;
     this.examples = examples;
   }
 
-  public int getId() {
+  public Integer getId() {
     return id;
   }
 
-  public void setId(int id) {
+  public void setId(Integer id) {
     this.id = id;
   }
 

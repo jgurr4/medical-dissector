@@ -17,9 +17,6 @@ public interface MedTermRepository extends JpaRepository<MedTerm, Long> {
 // Alternatively use Named parameters like this   where name like :title%
 // Notice how you don't need quotes to add a % symbol here. You can do same thing with numbered parameters, Test this to see if it works by removing the addition of % in medTermService method.
 
-  @Query(value = "select * from affix where affix regexp ?1", nativeQuery = true)
-  List<Affix> findByAffixStartsWith(String letters);
-
 //  @Query(value = "", nativeQuery = true)
 //  Optional<MedTerm> searchByName(String name);
 
