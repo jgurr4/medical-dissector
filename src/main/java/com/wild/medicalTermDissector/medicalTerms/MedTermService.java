@@ -55,8 +55,5 @@ public class MedTermService {
     return medTermRepository.findByNameStartsWith(letters);
   }
 
-  public Map<String, String> dissect(String term) {
-    return null;
-  }
 
 }

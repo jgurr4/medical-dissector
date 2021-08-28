@@ -24,11 +24,6 @@ public class MedTermController {
     return medTermService.getMedTerms(letters);
   }
 
-  @GetMapping(path = "/dissect/{term}")
-  public Map<String, String> getDissectedTerm(@PathVariable("term") String term) {
-    return medTermService.dissect(term);
-  }
-
   @PostMapping
   public void addNewMedTerm(@RequestBody MedTerm medTerm) {
     medTermService.addMedTerm(medTerm);
