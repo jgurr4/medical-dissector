@@ -132,6 +132,12 @@ class MedTermDissectorTests {
   }
 
   //FIXME: right now emia returns -aemia and -emia which are completely different affixes. There is no backup plan in case all the letters of term are used, and it still retrieves multiple results. What should it do in that case?
+  // Test this with 5 other words, and then also test with a word that I don't have complete or exact affix for.
+  // For example: hypovolemia. I don't have affix for 'vol'. what should your function do, if it cannot find a affix which matches or even closely matches?
+  // It's possible vol really is a variation of ole, but that would mean emia is mixed with ole. Find out if that is a common thing with medical terms, or if that rarely or never happens.
+  // According to the internet hypovolemia is a decrease of blood volume. So vol = volume. Which is where because I cannot find any affix for vol. So maybe I'll make one. It's probably not a medical affix, it could actually be a normal english affix.
+  // That might be more common of a problem. Best solution if my function cannot find a matching affix for vol, is to return a exception which states that word has affixes not visible in the database. If that happens, whatever function that called this
+  // function should offer to guide user to adding the medical term and it's appropriate affixes to the database.
   @Test
   public void dissectSuccess() {
     String term = "hypoglycemia";

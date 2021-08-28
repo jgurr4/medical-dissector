@@ -7,6 +7,7 @@ import javax.persistence.*;
 public class Affix {
 
   @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private Integer id;
   private String affix;
   private String meaning;
