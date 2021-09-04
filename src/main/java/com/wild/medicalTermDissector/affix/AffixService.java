@@ -19,41 +19,36 @@ public class AffixService {
   public List<Affix> dissect(String term) {
     List<Affix> affixes;
     Affix correctAffix;
-//    final HashMap<Integer, Affix> dissectedParts = new HashMap<>();
     List<Affix> dissectedParts = new ArrayList<>();
-    for (int i = 1; i <= term.length(); i++) {    // hyp\\(?o\\)?  should return hypo- or hyp(o)-
-      affixes = affixRepository.findByAffixStartsWith(term.substring(0, i).replaceAll("[a-z]-?$", "\\\\(?" + term.substring(i - 1, i) + "\\\\)?")); //FIXME: This only works on one letter at a time. But some affixes have two letters inside parentheses like this: // hem(at)-, haem(ato)-
+    for (int i = 1; i <= term.length(); i++) {
+      if (term.length() == 1) {
+        return dissectedParts;
+      }
+      affixes = affixRepository.findByAffixStartsWith(term.substring(0, i));
       if (affixes.size() == 1) {
-        // Add affixes object to map using id as key.
         dissectedParts.add(affixes.get(0));
         String[] variations = findVariations(affixes.get(0));
-        // check if more than one variation exists, in which case existing term is compared. If only one exists, then it removes that affix from term and returns term.
         if (variations.length > 1) {
-          for (int j = 0; j < variations.length; j++) {  // Basically this checks if the term matches any affixes in the list of variations exactly. If it doesn't match exactly it runs the above code again with another letter added on until it does match exactly. If it gets through entire word without matching exactly, then that means no affix exists in database for that word.
+          for (int j = 0; j < variations.length; j++) {
             if (variations[j] == term.substring(0, i)) {
               term = term.substring(i);
               break;
             }
           }
         } else {
-          term = term.replace(variations[0], ""); // remove affix from term.
-          i = 1;                                             // reset i to start loop with remaining chars.
+          term = term.replace(variations[0], "");
+          i = 1;
         }
-      } else if (i == term.length()) { // If we reach end of the loop and still not narrowed down to one affixes object.  This code will run which determines which affixes most closely relates. First, it
-        correctAffix = determineCorrectAffix(affixes, term);
+      } else if (i == term.length()) {
+        correctAffix = determineCorrectAffix(affixes, term); // FIXME: If this is null then you should return the list of closely related affixes that you found with affixes
         dissectedParts.add(correctAffix);
       }
     }
     return dissectedParts;
   }
 
-  // This currently only works for end of words. There is no easy way to make it work for words in middle or beginning.
-  // To prevent that, just make sure you update affixes table with the most affixes possible, and your med-Terms table should have as many med-terms as possible.
-
+  //FIXME: This currently doesn't work for multi-meaning affixes. Such as 'an-' which has two records in database.
   private Affix determineCorrectAffix(List<Affix> affixes, String term) {
-    // using variations of each affix in the list, compares each one to the term. The one which matches the closest is
-    // the one chosen. for example the last four letters "emia" may pull up both aemia and emia. The one that is a closer
-    // match is emia because that has 100% of letters, and nothing extra.
     for (int i = 0; i < affixes.size(); i++) {
       String[] variations = findVariations(affixes.get(i));
       for (int j = 0; j < variations.length; j++) {
@@ -66,13 +61,11 @@ public class AffixService {
   }
 
   public String[] findVariations(Affix affix) {
-    // This removes special chars like [n] () and - from affixes so that it will be easier to compare
-    // to med term substrings.
     return affix.getAffix()
       .replaceAll("\\[[0-9]\\]", "")
       .replace("(", "")
       .replace(")", "")
-      .replace("-", "")  // todo: test if .split works when there are no commas to make a single-element array.
+      .replace("-", "")
       .split(",");  // At this point -algia, alg(i)o- would become { algia, algio } so now it's easier to compare to term.substring(0, i)
   }
 

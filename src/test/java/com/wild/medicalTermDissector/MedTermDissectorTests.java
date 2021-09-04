@@ -149,9 +149,11 @@ class MedTermDissectorTests {
     AffixService affixService = new AffixService(affixRepository);
     List<Affix> dissectedParts = affixService.dissect(term);
     System.out.println(dissectedParts.get(0).getAffix());
-    System.out.println(dissectedParts.get(0).getMeaning());
-    System.out.println(dissectedParts.get(1).getMeaning());
-    System.out.println(dissectedParts.get(2).getMeaning());
+    System.out.println("meaning: " + dissectedParts.get(0).getMeaning());
+    System.out.println(dissectedParts.get(1).getAffix());
+    System.out.println("meaning: " + dissectedParts.get(1).getMeaning());
+    System.out.println(dissectedParts.get(2).getAffix());
+    System.out.println("meaning: " + dissectedParts.get(2).getMeaning());
     System.out.println(dissectedParts.get(0).getExamples());
     assertEquals("hyp(o)-", dissectedParts.get(0).getAffix());
     assertEquals("below normal", dissectedParts.get(0).getMeaning()); //"hypo-"
@@ -161,15 +163,72 @@ class MedTermDissectorTests {
   }
 
   @Test
-  public void missingAffixSuccess() {
-    // Test any word here that contains a variation of an affix that isn't in my database yet.
-    // Any medical terms in the database which the user searches for and chooses will have affixes.
-    // If affix variations are missing. Then a user must add them manually after they add the med term.
-    // If a medical term typed by a user doesn't exist, when they dissect it, it automatically adds that med_term
-    // to the database, and will also detect closely related affixes for dissection display to user. If the user
-    // disagrees with a affix being used, they will be given an option to manually choose the correct affixes for the
-    // med_term. If the relevant affixes do not exist, or the meaning exists, but the correct variation doesn't exist, then
-    // a user has the ability to add their own affixes as well.
+  public void testMissingAffix() {
+    // Ideally this should return "hypo: lack of, vol: null, emia: blood"
+    String term = "hypovolemia";
+    AffixService affixService = new AffixService(affixRepository);
+    List<Affix> dissectedParts = affixService.dissect(term);
+    System.out.println(dissectedParts.get(0).getAffix());   // hypo-
+    System.out.println("meaning: " + dissectedParts.get(0).getMeaning()); // below normal
+    System.out.println(dissectedParts.get(1).getAffix());   // "vol"
+    System.out.println("meaning: " + dissectedParts.get(1).getMeaning()); // null
+    System.out.println(dissectedParts.get(2).getAffix());
+    System.out.println("meaning: " + dissectedParts.get(2).getMeaning());
+    assertEquals("hyp(o)-", dissectedParts.get(0).getAffix());
+    assertEquals("below normal", dissectedParts.get(0).getMeaning());
+    assertEquals(null, dissectedParts.get(1).getMeaning());
+    assertEquals("blood condition (Am. Engl.),blood", dissectedParts.get(2).getMeaning());
+  }
+
+
+  @Test
+  public void testTwoLetterParentheses() {
+    String term = "analgesic";
+    // "-alge(si)" is a affix with double letter parentheses. (COMPLETE)
+
+    // Furthermore an-, and ana- are both real affixes, but only one will work in this instance.
+    // How can algorithm choose the correct one every time?
+
+    // Also 'an-' actually appears twice in affix list because it has two different meanings based on context.
+    // In these instances it should return both affixes and let the user choose which one makes more sense.
+    // After the user chooses the one that makes the most sense, it should send me a message and then I will make the
+    // algorithm automatically choose that option for that word from then on.
+
+    // Also algesic is not a affix that exists. (c) is missing. How should it handle that?
+    // c is only one letter so it shouldn't even be considered a dissected part. (COMPLETE)
+    AffixService affixService = new AffixService(affixRepository);
+    List<Affix> dissectedParts = affixService.dissect(term);
+    System.out.println(dissectedParts.get(0).getAffix());
+    System.out.println("meaning: " + dissectedParts.get(0).getMeaning());
+    System.out.println(dissectedParts.get(1).getAffix());
+    System.out.println("meaning: " + dissectedParts.get(1).getMeaning());
+    System.out.println(dissectedParts.get(2).getAffix());
+    System.out.println("meaning: " + dissectedParts.get(2).getMeaning());
+    System.out.println(dissectedParts.get(0).getExamples());
+    assertEquals("an-", dissectedParts.get(0).getAffix());
+    assertEquals("anus", dissectedParts.get(0).getMeaning()); //"an-"
+    assertEquals("pain", dissectedParts.get(1).getMeaning()); //"alge(si)"
+    assertEquals(null, dissectedParts.get(2)); //"c"
+  }
+
+  @Test
+  public void testRootWord() {
+    String term = "antibody"; // "-alge(si)" is a affix with double letter parentheses.
+    // Also algesic is not a affix that exists. (c) is missing. How should it handle that?
+    // c is only one letter so it shouldn't even be considered a dissected part.
+    AffixService affixService = new AffixService(affixRepository);
+    List<Affix> dissectedParts = affixService.dissect(term);
+    System.out.println(dissectedParts.get(0).getAffix());
+    System.out.println("meaning: " + dissectedParts.get(0).getMeaning());
+    System.out.println(dissectedParts.get(1).getAffix());
+    System.out.println("meaning: " + dissectedParts.get(1).getMeaning());
+    System.out.println(dissectedParts.get(2).getAffix());
+    System.out.println("meaning: " + dissectedParts.get(2).getMeaning());
+    System.out.println(dissectedParts.get(0).getExamples());
+    assertEquals("an-", dissectedParts.get(0).getAffix());
+    assertEquals("anus", dissectedParts.get(0).getMeaning()); //"an-"
+    assertEquals("pain", dissectedParts.get(1).getMeaning()); //"alge(si)"
+    assertEquals(null, dissectedParts.get(2)); //"c"
   }
 
 }
