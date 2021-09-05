@@ -14,10 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -132,34 +129,21 @@ class MedTermDissectorTests {
     assertFalse(testFailed);
   }
 
-  //FIXME:
-  // 1: Test this with 5 other words, and then also test with a word that I don't have complete or exact affix for.
-  // For example: hypovolemia. I don't have affix for 'vol'. what should your function do, if it cannot find a affix
-  // which matches or even closely matches?  It's possible vol really is a variation of ole, but that would mean emia
-  // is mixed with ole. Find out if that is a common thing with medical terms, or if that rarely or never happens.
-  // According to the internet hypovolemia is a decrease of blood volume. So vol = volume. Which is where because I
-  // cannot find any affix for vol. So maybe I'll make one. It's probably not a medical affix, it could actually be a
-  // normal english affix. That might be more common of a problem. Best solution if my function cannot find a matching
-  // affix for vol, is to return a exception which states that word has affixes not visible in the database. If that
-  // happens, whatever function that called this function should offer to guide user to adding the medical term and
-  // it's appropriate affixes to the database.
   @Test
   public void dissectSuccess() {
     String term = "hypoglycemia";
     AffixService affixService = new AffixService(affixRepository);
-    List<Affix> dissectedParts = affixService.dissect(term);
-    System.out.println(dissectedParts.get(0).getAffix());
-    System.out.println("meaning: " + dissectedParts.get(0).getMeaning());
-    System.out.println(dissectedParts.get(1).getAffix());
-    System.out.println("meaning: " + dissectedParts.get(1).getMeaning());
-    System.out.println(dissectedParts.get(2).getAffix());
-    System.out.println("meaning: " + dissectedParts.get(2).getMeaning());
-    System.out.println(dissectedParts.get(0).getExamples());
-    assertEquals("hyp(o)-", dissectedParts.get(0).getAffix());
-    assertEquals("below normal", dissectedParts.get(0).getMeaning()); //"hypo-"
-    assertEquals("sugar", dissectedParts.get(1).getMeaning()); //"glyc-"
-    assertEquals("blood condition (Am. Engl.),blood", dissectedParts.get(2).getMeaning()); //"-emia"
-//    assertEquals("hypovolemia, hypoxia", dissectedParts.get(0).getExamples());    // For some reason, all my examples columns have weird newlines and I can't get rid of them in database. Figure that out then this test will work.
+    Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
+    System.out.println("keyset: " + dissectedParts.keySet() + "\n");
+    for (Map.Entry<String, List<Affix>> me : dissectedParts.entrySet()) {
+      System.out.println(
+        "affix: " + dissectedParts.get(me.getKey()).get(0).getAffix() + "\n" +
+        "meaning: " + dissectedParts.get(me.getKey()).get(0).getMeaning() + "\n" +
+        "examples: " + dissectedParts.get(me.getKey()).get(0).getExamples() + "\n"
+      );
+    }
+    assertEquals("hyp(o)-", dissectedParts.get("hypo").get(0).getAffix());
+    assertEquals("below normal", dissectedParts.get("hypo").get(0).getMeaning());
   }
 
   @Test
@@ -167,7 +151,8 @@ class MedTermDissectorTests {
     // Ideally this should return "hypo: lack of, vol: null, emia: blood"
     String term = "hypovolemia";
     AffixService affixService = new AffixService(affixRepository);
-    List<Affix> dissectedParts = affixService.dissect(term);
+    Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
+/*
     System.out.println(dissectedParts.get(0).getAffix());   // hypo-
     System.out.println("meaning: " + dissectedParts.get(0).getMeaning()); // below normal
     System.out.println(dissectedParts.get(1).getAffix());   // "vol"
@@ -178,12 +163,12 @@ class MedTermDissectorTests {
     assertEquals("below normal", dissectedParts.get(0).getMeaning());
     assertEquals(null, dissectedParts.get(1).getMeaning());
     assertEquals("blood condition (Am. Engl.),blood", dissectedParts.get(2).getMeaning());
+*/
   }
 
 
   @Test
   public void testTwoLetterParentheses() {
-    String term = "analgesic";
     // "-alge(si)" is a affix with double letter parentheses. (COMPLETE)
 
     // Furthermore an-, and ana- are both real affixes, but only one will work in this instance.
@@ -196,8 +181,10 @@ class MedTermDissectorTests {
 
     // Also algesic is not a affix that exists. (c) is missing. How should it handle that?
     // c is only one letter so it shouldn't even be considered a dissected part. (COMPLETE)
+    String term = "analgesic";
     AffixService affixService = new AffixService(affixRepository);
-    List<Affix> dissectedParts = affixService.dissect(term);
+    Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
+/*
     System.out.println(dissectedParts.get(0).getAffix());
     System.out.println("meaning: " + dissectedParts.get(0).getMeaning());
     System.out.println(dissectedParts.get(1).getAffix());
@@ -209,14 +196,15 @@ class MedTermDissectorTests {
     assertEquals("anus", dissectedParts.get(0).getMeaning()); //"an-"
     assertEquals("pain", dissectedParts.get(1).getMeaning()); //"alge(si)"
     assertEquals(null, dissectedParts.get(2)); //"c"
+*/
   }
 
   @Test
   public void testRootWord() {
-    String term = "antibody"; // "-alge(si)" is a affix with double letter parentheses.
-    // Also algesic is not a affix that exists. (c) is missing. How should it handle that?
-    // c is only one letter so it shouldn't even be considered a dissected part.
+    String term = "antibody";
     AffixService affixService = new AffixService(affixRepository);
+    Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
+/*
     List<Affix> dissectedParts = affixService.dissect(term);
     System.out.println(dissectedParts.get(0).getAffix());
     System.out.println("meaning: " + dissectedParts.get(0).getMeaning());
@@ -229,6 +217,7 @@ class MedTermDissectorTests {
     assertEquals("anus", dissectedParts.get(0).getMeaning()); //"an-"
     assertEquals("pain", dissectedParts.get(1).getMeaning()); //"alge(si)"
     assertEquals(null, dissectedParts.get(2)); //"c"
+*/
   }
 
 }

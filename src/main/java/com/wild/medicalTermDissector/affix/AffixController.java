@@ -22,7 +22,7 @@ public class AffixController {
   }
 
   @GetMapping(path = "/dissect/{term}")
-  public List<Affix> getDissectedTerm(@PathVariable("term") String term) {
+  public Map<String, List<Affix>> getDissectedTerm(@PathVariable("term") String term) {
     return affixService.dissect(term);
   }
 
