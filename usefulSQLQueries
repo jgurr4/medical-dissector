@@ -2,3 +2,11 @@ select * from affix where match examples against ('abdominal')\G  // Fulltext se
 select * from affix where affix like '%hyper%'\G                 // Find the affix in affix column
 select * from affix where affix regexp "\\([a-z]\\)"\G           //Find all the affixes which contain optional parentheses letter like (o) or (i) etc...
 select * from affix where affix regexp "hyp\\(?o\\)?"\G          //Finds hypo or hyp(o)
+select * from affix where readAffix regexp concat('^', 'alg') or readAffix regexp concat(' ', 'alg')\G          //Finds related affixes.
+
+
+Use these four queries in spring-boot app: findExactPrefix(), findRelatedPrefix(), findExactRootOrSuffix(), findRelatedRootOrSuffix().
+select * from affix where readAffix regexp concat('^', 'hypo$') or readAffix regexp concat('^', 'hypo,') or readAffix regexp concat(' ', 'hypo,') or readAffix regexp concat(' ', 'hypo$') and prefix = true\G                                                                                                      // Finds exact prefix matches.
+select * from affix where readAffix regexp concat('^', 'hypo$') or readAffix regexp concat('^', 'hypo,') or readAffix regexp concat(' ', 'hypo,') or readAffix regexp concat(' ', 'hypo$') and prefix = false\G                                                                                                     // Finds exact suffix/root matches.
+select * from affix where readAffix regexp concat('^', 'alg') or readAffix regexp concat(' ', 'alg') and prefix = true\G          // Finds related prefixes;
+select * from affix where readAffix regexp 'ia$' or readAffix regexp 'ia,' and prefix = false\G                                   // Finds related suffixes/roots;

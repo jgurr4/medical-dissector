@@ -171,13 +171,15 @@ class MedTermDissectorTests {
   public void testTwoLetterParentheses() {
     // "-alge(si)" is a affix with double letter parentheses. (COMPLETE)
 
-    // Furthermore an-, and ana- are both real affixes, but only one will work in this instance.
-    // How can algorithm choose the correct one every time?
+    // Furthermore a-, an-, and ana- are all real affixes, but only one will work in this instance.
+    // How can algorithm choose the correct one every time? Answer: The algorithm needs to choose the smallest one and
+    // then check if the next part of the word creates a complete affix on its own, or if it only can do so after
+    // reducing one of the letters from itself. If it must remove a letter from beginning then that means the beginning affix needs to add a letter.
 
     // Also 'an-' actually appears twice in affix list because it has two different meanings based on context.
     // In these instances it should return both affixes and let the user choose which one makes more sense.
     // After the user chooses the one that makes the most sense, it should send me a message and then I will make the
-    // algorithm automatically choose that option for that word from then on.
+    // algorithm automatically choose that option for that word from then on. (HALF-COMPLETE)
 
     // Also algesic is not a affix that exists. (c) is missing. How should it handle that?
     // c is only one letter so it shouldn't even be considered a dissected part. (COMPLETE)

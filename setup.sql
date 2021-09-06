@@ -7,6 +7,7 @@ CREATE TABLE affix (
     affix varchar(100),
     meaning varchar(255),
     examples varchar(255),
+    `prefix` tinyint(1) DEFAULT 0,
     readAffix varchar(100) as (replace(replace(replace(`affix`,'(',''),')',''),'-','')) invisible,
     KEY `afx_idx` (`affix`)
 ) engine = aria;

@@ -20,16 +20,16 @@ public class AffixService {
 
   public Map<String, List<Affix>> dissect(String term) {
     List<Affix> affixes;
-    List<Affix> correctAffix;
+    List<Affix> matches;
     Map<String, List<Affix>> dissectedParts = new HashMap<>();
     String subterm = "";
+    String originalTerm = term;
     for (int i = 1; i <= term.length(); i++) {
       if (term.length() == 1) {
         return dissectedParts;
       }
-      affixes = affixRepository.findByAffixStartsWith(term.substring(0, i));
+      affixes = affixRepository.findByAffixStartsWith(term.substring(0, i), true);
       if (affixes.size() == 1) {
-//        dissectedParts.add(affixes.get(0));
         String[] variations = findVariations(affixes.get(0));
         if (variations.length > 1) {
           for (int j = 0; j < variations.length; j++) {
@@ -52,18 +52,18 @@ public class AffixService {
           i = 0;
         }
       } else if (i == term.length()) {
-        correctAffix = determineCorrectAffix(affixes, term);
-        if (correctAffix.isEmpty()) {
-          dissectedParts.put(subterm, affixes);   // Add all related records for the affix.
+        matches = findMatches(affixes, term);
+        if (matches.isEmpty()) {
+          dissectedParts.put(subterm, affixes);   // Add all related records for the affix and let the user choose.
         } else {
-          dissectedParts.put(subterm, correctAffix); // Add all matching records for the affix.
+          dissectedParts.put(subterm, matches); // Add all matching records for the affix and let the user choose if more than one exists.
         }
       }
     }
     return dissectedParts;
   }
 
-  private List<Affix> determineCorrectAffix(List<Affix> affixes, String term) {
+  private List<Affix> findMatches(List<Affix> affixes, String term) {
     List<Affix> correctAffix = new ArrayList<>();
     for (int i = 0; i < affixes.size(); i++) {
       String[] variations = findVariations(affixes.get(i));
