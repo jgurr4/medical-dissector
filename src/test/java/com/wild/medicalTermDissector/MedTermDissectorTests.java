@@ -129,6 +129,7 @@ class MedTermDissectorTests {
     assertFalse(testFailed);
   }
 
+/*
   @Test
   public void dissectSuccess() {
     String term = "hypoglycemia";
@@ -145,6 +146,7 @@ class MedTermDissectorTests {
     assertEquals("hyp(o)-", dissectedParts.get("hypo").get(0).getAffix());
     assertEquals("below normal", dissectedParts.get("hypo").get(0).getMeaning());
   }
+*/
 
   @Test
   public void testMissingAffix() {
@@ -152,6 +154,12 @@ class MedTermDissectorTests {
     String term = "hypovolemia";
     AffixService affixService = new AffixService(affixRepository);
     Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
+    final Affix[] values = dissectedParts.values().toArray(new Affix[dissectedParts.size()]);
+    for (int i = 0; i < values.length; i++) {
+      System.out.println(values[i].getAffix());
+      System.out.println(values[i].getMeaning());
+    }
+    assertEquals("hyp(o)-", values[0].getAffix());
 /*
     System.out.println(dissectedParts.get(0).getAffix());   // hypo-
     System.out.println("meaning: " + dissectedParts.get(0).getMeaning()); // below normal
@@ -166,7 +174,15 @@ class MedTermDissectorTests {
 */
   }
 
+/*
+  @Test
+  public void testMultipleWords() {
+  // This also tests how the algorithm handles more than one root/affix in a word.
+    String term = "Sphenopalatine Ganglioneuralgia";
+  }
+*/
 
+/*
   @Test
   public void testTwoLetterParentheses() {
     // "-alge(si)" is a affix with double letter parentheses. (COMPLETE)
@@ -186,6 +202,7 @@ class MedTermDissectorTests {
     String term = "analgesic";
     AffixService affixService = new AffixService(affixRepository);
     Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
+*/
 /*
     System.out.println(dissectedParts.get(0).getAffix());
     System.out.println("meaning: " + dissectedParts.get(0).getMeaning());
@@ -198,14 +215,18 @@ class MedTermDissectorTests {
     assertEquals("anus", dissectedParts.get(0).getMeaning()); //"an-"
     assertEquals("pain", dissectedParts.get(1).getMeaning()); //"alge(si)"
     assertEquals(null, dissectedParts.get(2)); //"c"
-*/
-  }
+*//*
 
+  }
+*/
+
+/*
   @Test
   public void testRootWord() {
     String term = "antibody";
     AffixService affixService = new AffixService(affixRepository);
     Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
+*/
 /*
     List<Affix> dissectedParts = affixService.dissect(term);
     System.out.println(dissectedParts.get(0).getAffix());
@@ -219,8 +240,10 @@ class MedTermDissectorTests {
     assertEquals("anus", dissectedParts.get(0).getMeaning()); //"an-"
     assertEquals("pain", dissectedParts.get(1).getMeaning()); //"alge(si)"
     assertEquals(null, dissectedParts.get(2)); //"c"
-*/
+*//*
+
   }
+*/
 
 }
 

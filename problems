@@ -1,3 +1,18 @@
+Redesign the dissect() method based on these rules:
+https://www.mpc.edu/home/showdocument?id=12804
+
+
+How this app will be when finished:
+
+ -> menu with one tab. Default tab will be 'search'
+ -> search lets you start typing a medical term and the app will begin finding the closest matches. If the user declines to click any of the matches and there is no exact match for the word when they hit enter, it will perform the actual term dissection. However it will not add the term to main table, instead it will add the term to a review table. A review words table where I can review words that were searched. The more commonly a word is searched the more likely I will be to add it to the real table with an actual definition and the dissected meanings. Then permanently this word will always show up as a match if it is typed by the user and dissect method will be skipped.
+ -> However, if a user does select a word as a match, or a exact match exists for the term they are searching, then instead of running the actual dissect method it saves time and performance by simply pulling up the existing data in the database based on previous dissections of that word. 
+ -> If a meaning of a word or affix is incorrect according to a user, there is a button called 'This doesn't look right" if they click that, then they will be given a form to fill out with the words which they felt were wrong, and their suggestion for correcting. This form submits to a `corrections` table which I will review manually.
+ -> If during the dissecting phase of a new term, more than one affixes match exactly for a single part of a word, then the matches will be shown to the user and they can choose which they think is more likely to be correct based on the meaning. This means a meaning of the actual term will also be searched online and provided from wikipedia or google dictionary etc...and shown to the user to help them decide. Whatever they decide is recorded in the `review words` table.
+
+
+
+
 select replace(replace(replace(affix, "(", ""), ")", ""), "-", "") from affix;   // turns '-hyp(o)' into 'hypo'
 alter table affix add readAffix varchar(100) as (replace(replace(replace(affix, "(", ""), ")", ""), "-", "")) invisible;
 

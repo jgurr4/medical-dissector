@@ -3,6 +3,7 @@ select * from affix where affix like '%hyper%'\G                 // Find the aff
 select * from affix where affix regexp "\\([a-z]\\)"\G           //Find all the affixes which contain optional parentheses letter like (o) or (i) etc...
 select * from affix where affix regexp "hyp\\(?o\\)?"\G          //Finds hypo or hyp(o)
 select * from affix where readAffix regexp concat('^', 'alg') or readAffix regexp concat(' ', 'alg')\G          //Finds related affixes.
+select * from affix where readaffix regexp '^[a-z]?,' or readaffix regexp ' [a-z]?,' or readAffix regexp '^[a-z]?$' or readAffix regexp ' [a-z]?$'\G     //Find all affixes which are only one letter long.
 
 
 Use these four queries in spring-boot app: findExactPrefix(), findRelatedPrefix(), findExactRootOrSuffix(), findRelatedRootOrSuffix().
