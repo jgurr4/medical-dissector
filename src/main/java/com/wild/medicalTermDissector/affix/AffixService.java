@@ -48,7 +48,7 @@ public class AffixService {
           }
         }
         subTerm = chooseCorrectVariation(findVariations(affixes.get(0)), subTerm);
-        newTerm = term.replace(subTerm, "");  // 'hypovolemia' becomes 'volemia'
+        newTerm = newTerm.replace(subTerm, "");  // 'hypovolemia' becomes 'volemia'
       } else { // At this point we just past FE(hypo) and chose it for prefix
         if (!newTerm.substring(0, i).equals('y')) { // For suffixes only
           i++;
@@ -65,20 +65,31 @@ public class AffixService {
           } else if (returnedResultSizes.get(exact) == 0 && returnedResultSizes.get(relative) == 0) { // 'vo' returns 0 for both.
             // begin reading from end instead.
             for (int j = newTerm.length(); j < 0; j--) {
-              if (!newTerm.substring(0, i).equals('y')) { // For suffixes only
+              if (!newTerm.substring(0, i).equals('y') && newTerm.length() > 1) { // For suffixes only
                 j--;
+              } else {
+                newTerm = possibleAnswers[0] + newTerm; // 'n' becomes 'an'
               }
               subTerm = newTerm.substring(newTerm.length() - j);
-              affixes = affixRepository.findByAffixEndsWith(subTerm, false); // fe('ia')
-              returnedResultSizes.put(exact, affixes.size()); // exact: 0
-              if (returnedResultSizes.get(exact) == 1) {
-                possibleAnswers[2] = affixes.get(0).getAffix();  // [ hypo, null, 'ia' ]
-                return makeMap(term, possibleAnswers); // end it here
-                // Instead of making a map of values here, consider if it's better to use map from the start, otherwise
-                // figure out how to add a list of exact matches when those occur.
+              affixes = affixRepository.findByExactAffix(subTerm, false); // fe('ia')
+              returnedResultSizes.put(exact, affixes.size());
+              if (returnedResultSizes.get(relative) > 0) {
+                possibleAnswers[9] = affixes.get(0).getAffix();
               } else {
-
+                affixes = affixRepository.findByAffixEndsWith(subTerm, false); // fr('ia')
+                returnedResultSizes.put(relative, affixes.size()); // exact: 0
+                if (returnedResultSizes.get(relative) > 0) {
+                  possibleAnswers[9] = affixes.get(0).getAffix();  // [ hypo, null, 'ia' ]
+                } else {
+                  // This means searching from the end couldn't find any valid affix or root. For example hypothetically imagine if 'emia' wasn't in the database.
+                  // Later I will work on getting this to actually keep going and read more sophisticated from right to left to keep finding terms from the middle if possible
+                  // But for now, since this is exceptionally rare, I will just make it give up on the middle and end. so  'hypo' would be found, but 'volemia' would return null.
+                  return makeMap(term, possibleAnswers);
+                }
               }
+              // remove 'emia' from newTerm and keep going backwards. 'volemia' becomes 'vol' 'nalgesic' becomes 'n'
+              subTerm = possibleAnswers[9];
+              newTerm = newTerm.replace(subTerm, "");
             }
           } else {
             continue;   // Basically if > 1 exact or relative results exist then run through loop for next letter 'vol' in this case. Except vol won't happen like this since it gets caught in if statement above.
@@ -86,19 +97,22 @@ public class AffixService {
         }
       }
     }
-    return null;
+    return makeMap(term, possibleAnswers); // end it here
   }
 
-  private Map<String, List<Affix>> makeMap(String term, String[] possibleAnswers) {
+  public Map<String, List<Affix>> makeMap(String term, String[] possibleAnswers) {
     Map<String, List<Affix>> map = new HashMap<>();
     for (int i = 0; i < possibleAnswers.length; i++) {
-      if (i == 0) { // Adds a list of the exact matches in database. Most cases there will only be one match, but sometimes there are 2.
+      if (i == 0 && possibleAnswers[i] != null) { // Adds a list of the exact matches in database. Most cases there will only be one match, but sometimes there are 2.
         map.put(possibleAnswers[i], affixRepository.findByExactAffix(possibleAnswers[i], true));
-      } else {
+        term = term.replace(possibleAnswers[i], "");
+      } else if (possibleAnswers[i] != null) {
         map.put(possibleAnswers[i], affixRepository.findByExactAffix(possibleAnswers[i],false));
+        term = term.replace(possibleAnswers[i], "");
       }
     }
-    return null;
+    map.put(term, null);
+    return map;
   }
 
   // Make code that resets to beginning of the word if it fails. Example: i = 1; newTerm = term;

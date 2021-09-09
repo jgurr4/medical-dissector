@@ -129,6 +129,30 @@ class MedTermDissectorTests {
     assertFalse(testFailed);
   }
 
+  @Test
+  public void makeMapSuccess() {
+    final String term = "hypovolemia";
+    final String[] possibleAnswers = new String[10];
+    possibleAnswers[0] = "hypo";
+    possibleAnswers[9] = "emia";
+    final AffixService affixService = new AffixService(affixRepository);
+    final Map<String, List<Affix>> dissectedParts = affixService.makeMap(term, possibleAnswers);
+    System.out.println("\nResults:");
+    System.out.println(dissectedParts.keySet());
+    final Object[] arr = dissectedParts.keySet().toArray();
+    for (int i = 0; i < arr.length; i++) {
+      if (dissectedParts.get(arr[i]) != null) {
+        System.out.println(arr[i]);
+        System.out.println(dissectedParts.get(arr[i]).get(0).getMeaning());
+      } else {
+        System.out.println(arr[i]);
+        System.out.println("null");
+      }
+    }
+    System.out.println("");
+    assertNull(dissectedParts.get("vol"));
+  }
+
 /*
   @Test
   public void dissectSuccess() {
