@@ -38,3 +38,5 @@ out/
 .vscode/
 
 application.properties
+apikeyonly.html
+oauth2.html

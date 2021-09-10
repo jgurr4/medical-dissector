@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -132,9 +133,9 @@ class MedTermDissectorTests {
   @Test
   public void makeMapSuccess() {
     final String term = "hypovolemia";
-    final String[] possibleAnswers = new String[10];
-    possibleAnswers[0] = "hypo";
-    possibleAnswers[9] = "emia";
+    final ArrayList<String> possibleAnswers = new ArrayList<>();
+    possibleAnswers.add("emia");
+    possibleAnswers.add("hypo");
     final AffixService affixService = new AffixService(affixRepository);
     final Map<String, List<Affix>> dissectedParts = affixService.makeMap(term, possibleAnswers);
     System.out.println("\nResults:");

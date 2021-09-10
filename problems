@@ -1,5 +1,23 @@
+Anatomy of a word: Preffix - root - suffix
+
 Redesign the dissect() method based on these rules:
 https://www.mpc.edu/home/showdocument?id=12804
+Rule 1:
+A word can be made of just roots and roots can appear beginning middle or end of a word. Example: Geo- -logy
+Rule 2: 
+A word can have more than one root prefix or suffix. Example: 
+Rule 3:
+A suffix can appear in the middle or the end, but never the beginning of a word.
+Rule 4:
+A prefix can appear in the beginning or the middle, but never the end of a word.
+Rule 5:
+The spelling of roots may change as they are combined with suffixes.
+Rule 6: 
+Sometimes you may identify a group of letters as a prefix or root but find that it does not
+carry the meaning of that prefix or root.  For example, the letters mis in missile are part of the root and are not the prefix mis-, which
+means “wrong; bad.”
+Rule 7:
+Words do not always have a root, prefix or a suffix. They will always have at least one type, but may be missing the other two types of parts.
 
 
 How this app will be when finished:
