@@ -111,6 +111,9 @@ public class AffixService {
   }
 
   public Map<String, List<Affix>> makeMap(String term, ArrayList<String> possibleAnswers) {
+    if (possibleAnswers.size() == 0) {
+      throw new IllegalArgumentException("no value present in ArrayList");
+    }
     List<Affix> affixes;
     String newTerm = term;
     for (int i = 0; i < possibleAnswers.size(); i++) {
@@ -120,9 +123,6 @@ public class AffixService {
       possibleAnswers.add(newTerm);
     }
     Map<String, List<Affix>> map = new LinkedHashMap<>();
-    if (possibleAnswers.size() == 0) {
-      throw new IllegalArgumentException("no value present in ArrayList");
-    }
     // create string array and sort the array based on where each part appears in the term provided.
     String[] arr = possibleAnswers.toArray(new String[possibleAnswers.size()]);
     String minValue = arr[0];

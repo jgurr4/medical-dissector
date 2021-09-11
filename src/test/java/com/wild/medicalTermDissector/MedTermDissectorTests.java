@@ -14,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -152,6 +151,16 @@ class MedTermDissectorTests {
     }
     System.out.println("");
     assertNull(dissectedParts.get("vol"));
+  }
+
+  @Test
+  public void makeMapFail() {
+    final String term = "test";
+    final ArrayList<String> possibleAnswers = new ArrayList<>();
+    final AffixService affixService = new AffixService(affixRepository);
+    assertThrows(IllegalArgumentException.class, () -> {
+      affixService.makeMap(term, possibleAnswers);
+    });
   }
 
 /*
