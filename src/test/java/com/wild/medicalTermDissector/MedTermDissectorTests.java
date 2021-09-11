@@ -185,15 +185,34 @@ class MedTermDissectorTests {
   @Test
   public void testMissingAffix() {
     // Ideally this should return "hypo: lack of, vol: null, emia: blood"
+    // I should probably make testMissingPrefix and testMissingSuffix as well. Just so I can make sure
+    // algorithm can handle missing parts from any part of the word.
     String term = "hypovolemia";
     AffixService affixService = new AffixService(affixRepository);
     Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
+    System.out.println("\nResults:");
+    System.out.println(dissectedParts.keySet());
+    final Object[] arr = dissectedParts.keySet().toArray();
+    for (int i = 0; i < arr.length; i++) {
+      if (dissectedParts.get(arr[i]) != null) {
+        System.out.println(arr[i]);
+        System.out.println(dissectedParts.get(arr[i]).get(0).getMeaning());
+      } else {
+        System.out.println(arr[i]);
+        System.out.println("null");
+      }
+    }
+    System.out.println("");
+    assertNull(dissectedParts.get("vol"));
+
+/*
     final Affix[] values = dissectedParts.values().toArray(new Affix[dissectedParts.size()]);
     for (int i = 0; i < values.length; i++) {
       System.out.println(values[i].getAffix());
       System.out.println(values[i].getMeaning());
     }
     assertEquals("hyp(o)-", values[0].getAffix());
+*/
 /*
     System.out.println(dissectedParts.get(0).getAffix());   // hypo-
     System.out.println("meaning: " + dissectedParts.get(0).getMeaning()); // below normal

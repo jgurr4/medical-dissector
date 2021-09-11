@@ -16,6 +16,7 @@ public class AffixService {
   }
 
   public Map<String, List<Affix>> dissect(String term) {
+    Boolean isValid;
     String newTerm = term;
     String subTerm = "";
     String exact = "exact";
@@ -23,7 +24,7 @@ public class AffixService {
     List<Affix> affixes;
     ArrayList<String> possibleAnswers = new ArrayList<>();
     Map<String, Integer> returnedResultSizes = new HashMap<>();
-    for (int i = 1; i < term.length(); i++) {
+    for (int i = 1; i < newTerm.length(); i++) {
       if (term.equals(newTerm)) {  // Check if we are working on getting the first section (prefix)
         if (!newTerm.substring(0, i).equals('a') && newTerm.substring(0, i).length() == 1) {  // For prefixes only
           i++;
@@ -48,26 +49,19 @@ public class AffixService {
         i = 1;
       } else { // At this point we just past FE(hypo) and chose it for prefix
         // Here is where we search after the first prefix in the middle of the word.
-        subTerm = newTerm.substring(0, i);
+        subTerm = newTerm.substring(0, i);  //TODO: Fix this returning 'vo' before it has checked 'v'.
         if (!newTerm.substring(0, i).equals('y') && !newTerm.substring(0, i).equals('a') && newTerm.substring(0, i).length() == 1) { // Check both because here could be prefix or suffix.
           i++;
         }
         affixes = affixRepository.findByExactAffix(subTerm, false);  //FE('vo')
         returnedResultSizes.put(exact, affixes.size());
-        if (returnedResultSizes.get(exact) == 1) {
-          subTerm = chooseCorrectVariation(findVariations(affixes.get(0)), subTerm);
-          newTerm = newTerm.replace(subTerm, "");  // 'hypovolemia' becomes 'volemia'
-          possibleAnswers.add(subTerm);
-          i = 1;
-        } else {
+        if (returnedResultSizes.get(exact) == 0) {
           affixes = affixRepository.findByAffixStartsWith(subTerm, false);  //FR('vo')
           returnedResultSizes.put(relative, affixes.size());
-          if (returnedResultSizes.get(relative) == 1) {
-            subTerm = chooseCorrectVariation(findVariations(affixes.get(0)), subTerm);
-            newTerm = newTerm.replace(subTerm, "");  // 'hypovolemia' becomes 'volemia'
-            possibleAnswers.add(subTerm);
-            i = 1;
-          } else if (returnedResultSizes.get(exact) == 0 && returnedResultSizes.get(relative) == 0) { // 'vo' returns 0 for both.
+          if (returnedResultSizes.get(relative) > 1) {
+            continue;
+          } else if (returnedResultSizes.get(exact) == 0 && returnedResultSizes.get(relative) == 0) { //TODO: Consider adding '&& newTerm.subString(0, i) != newTerm' here. In case newTerm.length check in for loop is not enough.
+            // This means no affix was found matching the word directly following prefix.
             // begin reading from end instead. right now subterm needs to be changed because it still equals 'vo'. It needs to be 'ia' instead.
             for (int j = newTerm.length() - 1; j > 0; j--) {
               if (!newTerm.substring(j).equals('y') && newTerm.substring(j).length() == 1) { // For suffixes only
@@ -77,37 +71,47 @@ public class AffixService {
 //              newTerm = possibleAnswers.add(newTerm); // 'n' becomes 'an'
               affixes = affixRepository.findByExactAffix(subTerm, false); // fe('ia')
               returnedResultSizes.put(exact, affixes.size());
-              if (returnedResultSizes.get(relative) > 0) {
-                possibleAnswers.add(affixes.get(0).getAffix());
-              } else {
+              if (returnedResultSizes.get(exact) == 0) {
                 affixes = affixRepository.findByAffixEndsWith(subTerm, false); // fr('ia')
                 returnedResultSizes.put(relative, affixes.size()); // exact: 0
-                if (returnedResultSizes.get(relative) == 1) { // Means we found exactly one match for this end affix.
-                  possibleAnswers.add(affixes.get(0).getAffix());  // [ hypo, null, 'ia' ]
-                  subTerm = chooseCorrectVariation(findVariations(affixes.get(0)), subTerm);
-                  newTerm = newTerm.replace(subTerm, "");  // 'hypovolemia' becomes 'volemia'
-                  j = newTerm.length() - 1;
+                if (returnedResultSizes.get(relative) > 1) { // Means we found exactly one match for this end affix.
+                  continue;
                 } else if (returnedResultSizes.get(exact) == 0 && returnedResultSizes.get(relative) == 0) {
                   // This means searching from the middle and end couldn't find any valid affix or root. For example hypothetically imagine if 'emia' wasn't in the database.
                   // Later I will work on getting this to actually keep going and read more sophisticated from right to left to keep finding terms from the middle if possible
                   // But for now, since this is exceptionally rare, I will just make it give up on the middle and end. so  'hypo' would be found, but 'volemia' would return null.
                   return makeMap(term, possibleAnswers);
-                } else { // This means more than one affix was found related to current word, so keep searching.
-                  continue;
                 }
               }
               // remove 'emia' from newTerm and keep going backwards. 'volemia' becomes 'vol' 'nalgesic' becomes 'n'
-              subTerm = possibleAnswers.get(possibleAnswers.size());
-              newTerm = newTerm.replace(subTerm, "");
-              j = newTerm.length() - 1;
+//              subTerm = possibleAnswers.get(possibleAnswers.size());
+              // This code should run if 1 or more exact affixes are found, or if exactly 1 related affix is found
+              subTerm = chooseCorrectVariation(findVariations(affixes.get(0)), subTerm);
+              isValid = determineIfValid(subTerm, newTerm); //TODO: Add this section to prefix and middle word sections.
+              if (isValid) {
+                newTerm = newTerm.replace(subTerm, "");  // 'hypovolemia' becomes 'volemia'
+                possibleAnswers.add(subTerm);  // [ hypo, null, 'ia' ]
+                j = newTerm.length() - 1;
+              }
             }
           } else {
-            continue;   // Basically if > 1 exact or relative results exist then run through loop for next letter 'vol' in this case. Except vol won't happen like this since it gets caught in if statement above.
+//            continue;   // Basically if > 1 exact or relative results exist for middle word then run through loop for next letter 'vol' in this case. Except vol won't happen like this since it gets caught in if statement above.
+            subTerm = chooseCorrectVariation(findVariations(affixes.get(0)), subTerm);
+            newTerm = newTerm.replace(subTerm, "");  // 'hypovolemia' becomes 'volemia'
+            possibleAnswers.add(subTerm);
+            i = 1;
           }
         }
       }
     }
     return makeMap(term, possibleAnswers); // end it here
+  }
+
+  private Boolean determineIfValid(String subTerm, String newTerm) {
+    if (newTerm.contains(subTerm)) {
+      return true;
+    }
+    return false;
   }
 
   public Map<String, List<Affix>> makeMap(String term, ArrayList<String> possibleAnswers) {
