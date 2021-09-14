@@ -26,7 +26,7 @@ public class AffixService {
     Map<String, Integer> returnedResultSizes = new HashMap<>();
     for (int i = 1; i < newTerm.length(); i++) {
       if (term.equals(newTerm)) {  // Check if we are working on getting the first section (prefix)
-        if (!newTerm.substring(0, i).equals('a') && newTerm.substring(0, i).length() == 1) {  // For prefixes only
+        if (!newTerm.substring(0, i).equals("a") && newTerm.substring(0, i).length() == 1) {  // For prefixes only
           i++;
         }
         subTerm = newTerm.substring(0, i);
@@ -44,15 +44,15 @@ public class AffixService {
         }
         // This code below happens if 1 or more exact matches occur, or exactly 1 related match happens.
         subTerm = chooseCorrectVariation(findVariations(affixes.get(0)), subTerm);
-        newTerm = newTerm.replace(subTerm, "");  // 'hypovolemia' becomes 'volemia'
+        newTerm = newTerm.replace(subTerm, "");  // 'analgesic' becomes 'nalgesic' at first pass.
         possibleAnswers.add(subTerm);
-        i = 1;
+        i = 0;
       } else { // At this point we just past FE(hypo) and chose it for prefix
         // Here is where we search after the first prefix in the middle of the word.
-        subTerm = newTerm.substring(0, i);  //TODO: Fix this returning 'vo' before it has checked 'v'.
-        if (!newTerm.substring(0, i).equals('y') && !newTerm.substring(0, i).equals('a') && newTerm.substring(0, i).length() == 1) { // Check both because here could be prefix or suffix.
+        if (!newTerm.substring(0, i).equals("y") && !newTerm.substring(0, i).equals("a") && newTerm.substring(0, i).length() == 1) { // Check both because here could be prefix or suffix.
           i++;
         }
+        subTerm = newTerm.substring(0, i);
         affixes = affixRepository.findByExactAffix(subTerm, false);  //FE('vo')
         returnedResultSizes.put(exact, affixes.size());
         if (returnedResultSizes.get(exact) == 0) {
@@ -69,7 +69,7 @@ public class AffixService {
               }
               subTerm = newTerm.substring(j); // j = 5 length = 6
 //              newTerm = possibleAnswers.add(newTerm); // 'n' becomes 'an'
-              affixes = affixRepository.findByExactAffix(subTerm, false); // fe('ia')
+              affixes = affixRepository.findByExactAffix(subTerm, false);  // '-ic' is the affix found here for 'ic' of nalgesic
               returnedResultSizes.put(exact, affixes.size());
               if (returnedResultSizes.get(exact) == 0) {
                 affixes = affixRepository.findByAffixEndsWith(subTerm, false); // fr('ia')
@@ -91,7 +91,7 @@ public class AffixService {
               if (isValid) {
                 newTerm = newTerm.replace(subTerm, "");  // 'hypovolemia' becomes 'volemia'
                 possibleAnswers.add(subTerm);  // [ hypo, null, 'ia' ]
-                j = newTerm.length() - 1;
+                j = newTerm.length();
               }
             }
           } else {
@@ -99,7 +99,7 @@ public class AffixService {
             subTerm = chooseCorrectVariation(findVariations(affixes.get(0)), subTerm);
             newTerm = newTerm.replace(subTerm, "");  // 'hypovolemia' becomes 'volemia'
             possibleAnswers.add(subTerm);
-            i = 1;
+            i = 0;
           }
         }
       }

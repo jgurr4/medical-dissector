@@ -1,3 +1,14 @@
+
+// The perfect dissecting query:   (This is a very powerful command. You can put any word in, not just medical terms)
+select def_id, affix, locate(affix,'apathy') as is_match from affix having is_match > 0;
+select def_id, affix, locate(affix,'hypovolemia') as is_match from affix having is_match > 0;
+select def_id, affix, locate(affix,'deuteronomy') as is_match from affix having is_match > 0;
+
+
+// Now I just need to combine this above with a join to join the definition table to it.
+
+
+
 select * from affix where match examples against ('abdominal')\G  // Fulltext search on examples column.
 select * from affix where affix like '%hyper%'\G                 // Find the affix in affix column
 select * from affix where affix regexp "\\([a-z]\\)"\G           //Find all the affixes which contain optional parentheses letter like (o) or (i) etc...
@@ -7,7 +18,63 @@ select * from affix where readaffix regexp '^[a-z]?,' or readaffix regexp ' [a-z
 
 
 Use these four queries in spring-boot app: findExactPrefix(), findRelatedPrefix(), findExactRootOrSuffix(), findRelatedRootOrSuffix().
+//FIXME: This has prefix = true in the wrong spot. It won't work like you want.
 select * from affix where readAffix regexp concat('^', 'hypo$') or readAffix regexp concat('^', 'hypo,') or readAffix regexp concat(' ', 'hypo,') or readAffix regexp concat(' ', 'hypo$') and prefix = true\G                                                                                                      // Finds exact prefix matches.
+
+//FIXME: This has prefix = true in the wrong spot. It won't work like you want.
 select * from affix where readAffix regexp concat('^', 'hypo$') or readAffix regexp concat('^', 'hypo,') or readAffix regexp concat(' ', 'hypo,') or readAffix regexp concat(' ', 'hypo$') and prefix = false\G                                                                                                     // Finds exact suffix/root matches.
+
+//FIXME: This has prefix = true in the wrong spot. It won't work like you want.
 select * from affix where readAffix regexp concat('^', 'alg') or readAffix regexp concat(' ', 'alg') and prefix = true\G          // Finds related prefixes;
+
+//FIXME: This has prefix = true in the wrong spot. It won't work like you want.
 select * from affix where readAffix regexp 'ia$' or readAffix regexp 'ia,' and prefix = false\G                                   // Finds related suffixes/roots;
+
+
+
+select * from affix where prefix = true;
+
+select * from affix where prefix = false; // 110 records  5 records should actually start with a prefix variation. see command below to see how to show them.
+
+Select all the affixes which normally have prefix set to false, but are true because they can also be used as suffixes:
+select * from affix where prefix = false and affix not regexp '^-'\G
+
+
+Find all the affixes that have parentheses in the meaning. (many of these have glitches and encoding problems that need to be fixed.)
+select * from affix where meaning regexp '\\(.*\\)'\G
+
+
+
+
+// This is a nice command that returns all possible affixes that match a term given. However, the problem with this, is that currently it fails to work on affixes with variations or more than one way to do. For example 'a-, an-' is left out, even though it should be in this. 
+// However, that being said, this command will be pretty much perfect once that problem is solved, and then all that will be left is to make combinations of those affixes to get the closest result to the actual word as possible. Some affixes may be used more than once, because some affixes do appear more than once in a single word I think... But I could be wrong about this.
+
+// The highest number of variations in a affix was 5. That was for sy, syl, sym, syn, sys.
+
+select affix, regexp_replace(readAffix, ',.*', '') as first, regexp_replace(readAffix, '^.*, ','') as second from affix limit 10\G
+
+
+// This is one method to solve the problem above. The downside is the query is now a lot more redundant and looks unorganized. However, it seems to be the simplest method I could find to solve this problem right now. Maybe later I'll find something better.
+select affix, locate(variation1,'apathy') is_match, locate(variation2,'apathy') is_match2, locate(variation3,'apathy') is_match3, locate(variation4,'apathy') is_match4, locate(variation5,'apathy') is_match5 from affix having is_match > 0 OR having is_match2 > 0 OR having is_match3 > 0 OR having is_match4 > 0 OR having is_match5 > 0;
+
+// Select all the affixes variations after the second variation.
+select id, readAffix, regexp_replace(readAffix, '^[a-z]+, [a-z]+, ', '') result from affix where readaffix regexp '.*, .*, ' limit 10\G
+
+// my attempt to get the second variation of the affixes.
+select id, readAffix, substring_index(readaffix, ', ',2) result from affix where readaffix regexp '.*, .*, ' limit 10\G
+
+//This is how to select each item from a list of comma separated values inside a column: sy, syl, sym, syn, sys
+1: select id, readAffix, substring_index(readaffix, ', ', 1) result from definition where readaffix regexp '.*, .*, ' limit 10\G
+2: select id, readAffix, substring_index(substring_index(readaffix, ', ', 2), ', ', -1) result from definition where readaffix regexp '.*, .*, ' limit 10\G
+3: select id, readAffix, substring_index(substring_index(readaffix, ', ', 3), ', ', -1) result from definition where readaffix regexp '.*, .*, ' limit 10\G
+4: select id, readAffix, substring_index(substring_index(readaffix, ', ', 4), ', ', -1) result from definition where readaffix regexp '.*, .*, ' limit 10\G
+5: select id, readAffix, substring_index(readaffix, ', ', -1) result from definition where readaffix regexp '.*, .*, ' limit 10\G
+// Alternatively just replace the first substring number and keep -1 for all.
+
+
+// Next step to split the column into a single row of values in another table, and join to that table for the original command.
+
+
+// Find all the affixes that have more than one definition:
+select def_id, count(affix) count, affix from affix group by affix having count > 1;
+

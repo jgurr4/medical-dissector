@@ -190,41 +190,8 @@ class MedTermDissectorTests {
     String term = "hypovolemia";
     AffixService affixService = new AffixService(affixRepository);
     Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
-    System.out.println("\nResults:");
-    System.out.println(dissectedParts.keySet());
-    final Object[] arr = dissectedParts.keySet().toArray();
-    for (int i = 0; i < arr.length; i++) {
-      if (dissectedParts.get(arr[i]) != null) {
-        System.out.println(arr[i]);
-        System.out.println(dissectedParts.get(arr[i]).get(0).getMeaning());
-      } else {
-        System.out.println(arr[i]);
-        System.out.println("null");
-      }
-    }
-    System.out.println("");
+    printDissectedParts(dissectedParts);
     assertNull(dissectedParts.get("vol"));
-
-/*
-    final Affix[] values = dissectedParts.values().toArray(new Affix[dissectedParts.size()]);
-    for (int i = 0; i < values.length; i++) {
-      System.out.println(values[i].getAffix());
-      System.out.println(values[i].getMeaning());
-    }
-    assertEquals("hyp(o)-", values[0].getAffix());
-*/
-/*
-    System.out.println(dissectedParts.get(0).getAffix());   // hypo-
-    System.out.println("meaning: " + dissectedParts.get(0).getMeaning()); // below normal
-    System.out.println(dissectedParts.get(1).getAffix());   // "vol"
-    System.out.println("meaning: " + dissectedParts.get(1).getMeaning()); // null
-    System.out.println(dissectedParts.get(2).getAffix());
-    System.out.println("meaning: " + dissectedParts.get(2).getMeaning());
-    assertEquals("hyp(o)-", dissectedParts.get(0).getAffix());
-    assertEquals("below normal", dissectedParts.get(0).getMeaning());
-    assertEquals(null, dissectedParts.get(1).getMeaning());
-    assertEquals("blood condition (Am. Engl.),blood", dissectedParts.get(2).getMeaning());
-*/
   }
 
 /*
@@ -235,7 +202,6 @@ class MedTermDissectorTests {
   }
 */
 
-/*
   @Test
   public void testTwoLetterParentheses() {
     // "-alge(si)" is a affix with double letter parentheses. (COMPLETE)
@@ -255,7 +221,9 @@ class MedTermDissectorTests {
     String term = "analgesic";
     AffixService affixService = new AffixService(affixRepository);
     Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
-*/
+    printDissectedParts(dissectedParts);
+    assertEquals("not, without (alpha privative)", dissectedParts.get("an").get(0).getMeaning());
+    assertEquals("anal", dissectedParts.get("an").get(1).getExamples());
 /*
     System.out.println(dissectedParts.get(0).getAffix());
     System.out.println("meaning: " + dissectedParts.get(0).getMeaning());
@@ -298,6 +266,23 @@ class MedTermDissectorTests {
   }
 */
 
+  }
+
+  private void printDissectedParts(Map<String, List<Affix>> dissectedParts) {
+    System.out.println("\nResults:");
+    System.out.println(dissectedParts.keySet());
+    final Object[] arr = dissectedParts.keySet().toArray();
+    for (int i = 0; i < arr.length; i++) {
+      if (dissectedParts.get(arr[i]) != null) {
+        System.out.println(arr[i]);
+        System.out.println(dissectedParts.get(arr[i]).get(0).getMeaning());
+      } else {
+        System.out.println(arr[i]);
+        System.out.println("null");
+      }
+    }
+    System.out.println("");
+  }
 }
 
 /*

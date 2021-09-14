@@ -1,3 +1,7 @@
+Why is it ok to allow related prefix of 1 to stop the search for more prefixes, but not the same for suffixes and roots appearing later?
+if 'a' returns 14 related results we keep going, then 'an' returns 1 related result, we can stop at an
+
+
 Anatomy of a word: Preffix - root - suffix
 
 Redesign the dissect() method based on these rules:
