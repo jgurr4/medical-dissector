@@ -12,15 +12,25 @@ public class Affix {
   private String affix;
   private String meaning;
   private String examples;
+  private String readableAffix;
 
   public Affix() {
   }
 
-  public Affix(Integer id, String affix, String meaning, String examples) {
+  public Affix(Integer id, String affix, String meaning, String examples, String readableAffix) {
     this.id = id;
     this.affix = affix;
     this.meaning = meaning;
     this.examples = examples;
+    this.readableAffix = readableAffix;
+  }
+
+  public String getReadableAffix() {
+    return readableAffix;
+  }
+
+  public void setReadableAffix(String readableAffix) {
+    this.readableAffix = readableAffix;
   }
 
   public Integer getId() {
@@ -62,6 +72,7 @@ public class Affix {
       "affix='" + affix + '\'' +
       ", meaning='" + meaning + '\'' +
       ", examples='" + examples + '\'' +
+      ", readableAffix='" + readableAffix + '\'' +
       '}';
   }
 

@@ -9,25 +9,15 @@ import java.util.List;
 @Repository
 public interface AffixRepository extends JpaRepository<Affix, Integer> {
 
-/*
-  @Query(value = "select * from affix where prefix = ?2 and readAffix regexp concat('^', ?1) or readAffix regexp concat(' ', ?1)", nativeQuery = true)
-  List<Affix> findByAffixStartsWith(String letters, Boolean isPrefix);
-*/
-  @Query(value = "select * from affix where readAffix regexp concat('^', ?1) or readAffix regexp concat(' ', ?1)", nativeQuery = true)
+  @Query(value = "select * from affix_view where readable_affix regexp concat('^', ?1) or readable_affix regexp concat(' ', ?1)", nativeQuery = true)
   List<Affix> findByAffixStartsWith(String letters);
 
-/*
-  @Query(value = "select * from affix where prefix = ?2 and readAffix regexp concat(?1, '$') or readAffix regexp concat(?1, ',')", nativeQuery = true)
-  List<Affix> findByAffixEndsWith(String letters, Boolean isPrefix);
-*/
-  @Query(value = "select * from affix where readAffix regexp concat(?1, '$') or readAffix regexp concat(?1, ',')", nativeQuery = true)
+  @Query(value = "select * from affix_view where readable_affix regexp concat(?1, '$') or readable_affix regexp concat(?1, ',')", nativeQuery = true)
   List<Affix> findByAffixEndsWith(String letters);
 
-/*
-  @Query(value = "select * from affix where prefix = ?2 and readAffix regexp concat('^', ?1, '$') or readAffix regexp concat('^', ?1, ',') or readAffix regexp concat(' ', ?1, ',') or readAffix regexp concat(' ', ?1, '$')", nativeQuery = true)
-  List<Affix> findByExactAffix(String letters, Boolean isPrefix);
-*/
-
-  @Query(value = "select * from affix where readAffix regexp concat('^', ?1, '$') or readAffix regexp concat('^', ?1, ',') or readAffix regexp concat(' ', ?1, ',') or readAffix regexp concat(' ', ?1, '$')", nativeQuery = true)
+  @Query(value = "select * from affix_view where readable_affix regexp concat('^', ?1, '$') or readable_affix regexp concat('^', ?1, ',') or readable_affix regexp concat(' ', ?1, ',') or readable_affix regexp concat(' ', ?1, '$')", nativeQuery = true)
   List<Affix> findByExactAffix(String letters);
+
+  @Query(value = "select id, affix, meaning, examples, readable_affix, locate(readable_affix, ?1) as is_match from affix_view having is_match > 0", nativeQuery = true)
+  List<Affix> findByMedTerm(String medTerm);
 }

@@ -6,6 +6,9 @@ select def_id, affix, locate(affix,'deuteronomy') as is_match from affix having 
 
 
 // Now I just need to combine this above with a join to join the definition table to it.
+select d.id, d.affix, d.meaning, d.examples, d.prefix, a.def_id, a.affix, locate(a.affix,'hypovolemia') as is_match from definition d inner join affix a on (d.id = a.def_id) having is_match > 0\G
+// Here is one solution. The problem with this is that it returns more than just the affix object required for java program, but that is only a problem depending on how my app allows it or not. 
+The other problem is that it will return the same object more than once, so I need my app to ensure it only uses the correct one once it has chosen it based on what combination of affixes works better. If there are duplicates used in the word, then that is ok for multiple affix objects of the same kind to exist in those cases.
 
 
 

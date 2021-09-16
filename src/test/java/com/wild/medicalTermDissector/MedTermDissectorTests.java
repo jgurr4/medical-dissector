@@ -24,11 +24,13 @@ class MedTermDissectorTests {
 
   private final MedTermRepository medTermRepository;
   private final AffixRepository affixRepository;
+  private final AffixService affixService;
 
   @Autowired
-  MedTermDissectorTests(MedTermRepository medTermRepository, AffixRepository affixRepository) {
+  MedTermDissectorTests(MedTermRepository medTermRepository, AffixRepository affixRepository, AffixService affixService) {
     this.medTermRepository = medTermRepository;
     this.affixRepository = affixRepository;
+    this.affixService = affixService;
   }
 
 
@@ -135,7 +137,6 @@ class MedTermDissectorTests {
     final ArrayList<String> possibleAnswers = new ArrayList<>();
     possibleAnswers.add("emia");
     possibleAnswers.add("hypo");
-    final AffixService affixService = new AffixService(affixRepository);
     final Map<String, List<Affix>> dissectedParts = affixService.makeMap(term, possibleAnswers);
     System.out.println("\nResults:");
     System.out.println(dissectedParts.keySet());
@@ -157,17 +158,14 @@ class MedTermDissectorTests {
   public void makeMapFail() {
     final String term = "test";
     final ArrayList<String> possibleAnswers = new ArrayList<>();
-    final AffixService affixService = new AffixService(affixRepository);
     assertThrows(IllegalArgumentException.class, () -> {
       affixService.makeMap(term, possibleAnswers);
     });
   }
 
-/*
   @Test
   public void dissectSuccess() {
     String term = "hypoglycemia";
-    AffixService affixService = new AffixService(affixRepository);
     Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
     System.out.println("keyset: " + dissectedParts.keySet() + "\n");
     for (Map.Entry<String, List<Affix>> me : dissectedParts.entrySet()) {
@@ -180,19 +178,19 @@ class MedTermDissectorTests {
     assertEquals("hyp(o)-", dissectedParts.get("hypo").get(0).getAffix());
     assertEquals("below normal", dissectedParts.get("hypo").get(0).getMeaning());
   }
-*/
 
+/*
   @Test
   public void testMissingAffix() {
     // Ideally this should return "hypo: lack of, vol: null, emia: blood"
     // I should probably make testMissingPrefix and testMissingSuffix as well. Just so I can make sure
     // algorithm can handle missing parts from any part of the word.
     String term = "hypovolemia";
-    AffixService affixService = new AffixService(affixRepository);
     Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
     printDissectedParts(dissectedParts);
     assertNull(dissectedParts.get("vol"));
   }
+*/
 
 /*
   @Test
@@ -202,6 +200,7 @@ class MedTermDissectorTests {
   }
 */
 
+/*
   @Test
   public void testTwoLetterParentheses() {
     // "-alge(si)" is a affix with double letter parentheses. (COMPLETE)
@@ -219,24 +218,10 @@ class MedTermDissectorTests {
     // Also algesic is not a affix that exists. (c) is missing. How should it handle that?
     // c is only one letter so it shouldn't even be considered a dissected part. (COMPLETE)
     String term = "analgesic";
-    AffixService affixService = new AffixService(affixRepository);
     Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
     printDissectedParts(dissectedParts);
     assertEquals("not, without (alpha privative)", dissectedParts.get("an").get(0).getMeaning());
     assertEquals("anal", dissectedParts.get("an").get(1).getExamples());
-/*
-    System.out.println(dissectedParts.get(0).getAffix());
-    System.out.println("meaning: " + dissectedParts.get(0).getMeaning());
-    System.out.println(dissectedParts.get(1).getAffix());
-    System.out.println("meaning: " + dissectedParts.get(1).getMeaning());
-    System.out.println(dissectedParts.get(2).getAffix());
-    System.out.println("meaning: " + dissectedParts.get(2).getMeaning());
-    System.out.println(dissectedParts.get(0).getExamples());
-    assertEquals("an-", dissectedParts.get(0).getAffix());
-    assertEquals("anus", dissectedParts.get(0).getMeaning()); //"an-"
-    assertEquals("pain", dissectedParts.get(1).getMeaning()); //"alge(si)"
-    assertEquals(null, dissectedParts.get(2)); //"c"
-*//*
 
   }
 */
@@ -266,8 +251,8 @@ class MedTermDissectorTests {
   }
 */
 
-  }
 
+  // Use this in methods which test dissect method in order to print out the results.
   private void printDissectedParts(Map<String, List<Affix>> dissectedParts) {
     System.out.println("\nResults:");
     System.out.println(dissectedParts.keySet());

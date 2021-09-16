@@ -3,12 +3,16 @@ package com.wild.medicalTermDissector.affix;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Array;
 import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class AffixService {
 
   private final AffixRepository affixRepository;
+  private static final Logger LOGGER = LoggerFactory.getLogger(AffixService.class);
 
   @Autowired
   public AffixService(AffixRepository affixRepository) {
@@ -16,96 +20,111 @@ public class AffixService {
   }
 
   public Map<String, List<Affix>> dissect(String term) {
-    Boolean isValid;
-    String newTerm = term;
-    String subTerm = "";
-    String exact = "exact";
-    String relative = "relative";
-    List<Affix> affixes;
-    ArrayList<String> possibleAnswers = new ArrayList<>();
-    Map<String, Integer> returnedResultSizes = new HashMap<>();
-    for (int i = 1; i < newTerm.length(); i++) {
-      if (term.equals(newTerm)) {  // Check if we are working on getting the first section (prefix)
-        if (!newTerm.substring(0, i).equals("a") && newTerm.substring(0, i).length() == 1) {  // For prefixes only
-          i++;
-        }
-        subTerm = newTerm.substring(0, i);
-        affixes = affixRepository.findByExactAffix(subTerm, true);
-        returnedResultSizes.put(exact, affixes.size());
-        if (returnedResultSizes.get(exact) == 0) {  // If one or more exact matches exist for 'an' for example.
-          affixes = affixRepository.findByAffixStartsWith(subTerm, true);
-          returnedResultSizes.put(relative, affixes.size());
-          if (returnedResultSizes.get(relative) > 1) {
-            continue; //If more than one match occurs skip this and continue
-          } else if (returnedResultSizes.get(exact) == 0 && returnedResultSizes.get(relative) == 0) { // should be rare.
-            // If 0 matches occur for both.
-            // put some method here to handle cases where a prefix is not found that exists in the database. Hypothetically: Imagine if 'hypo' didn't exist.
-          }
-        }
-        // This code below happens if 1 or more exact matches occur, or exactly 1 related match happens.
-        subTerm = chooseCorrectVariation(findVariations(affixes.get(0)), subTerm);
-        newTerm = newTerm.replace(subTerm, "");  // 'analgesic' becomes 'nalgesic' at first pass.
-        possibleAnswers.add(subTerm);
-        i = 0;
-      } else { // At this point we just past FE(hypo) and chose it for prefix
-        // Here is where we search after the first prefix in the middle of the word.
-        if (!newTerm.substring(0, i).equals("y") && !newTerm.substring(0, i).equals("a") && newTerm.substring(0, i).length() == 1) { // Check both because here could be prefix or suffix.
-          i++;
-        }
-        subTerm = newTerm.substring(0, i);
-        affixes = affixRepository.findByExactAffix(subTerm, false);  //FE('vo')
-        returnedResultSizes.put(exact, affixes.size());
-        if (returnedResultSizes.get(exact) == 0) {
-          affixes = affixRepository.findByAffixStartsWith(subTerm, false);  //FR('vo')
-          returnedResultSizes.put(relative, affixes.size());
-          if (returnedResultSizes.get(relative) > 1) {
-            continue;
-          } else if (returnedResultSizes.get(exact) == 0 && returnedResultSizes.get(relative) == 0) { //TODO: Consider adding '&& newTerm.subString(0, i) != newTerm' here. In case newTerm.length check in for loop is not enough.
-            // This means no affix was found matching the word directly following prefix.
-            // begin reading from end instead. right now subterm needs to be changed because it still equals 'vo'. It needs to be 'ia' instead.
-            for (int j = newTerm.length() - 1; j > 0; j--) {
-              if (!newTerm.substring(j).equals('y') && newTerm.substring(j).length() == 1) { // For suffixes only
-                j--;
-              }
-              subTerm = newTerm.substring(j); // j = 5 length = 6
-//              newTerm = possibleAnswers.add(newTerm); // 'n' becomes 'an'
-              affixes = affixRepository.findByExactAffix(subTerm, false);  // '-ic' is the affix found here for 'ic' of nalgesic
-              returnedResultSizes.put(exact, affixes.size());
-              if (returnedResultSizes.get(exact) == 0) {
-                affixes = affixRepository.findByAffixEndsWith(subTerm, false); // fr('ia')
-                returnedResultSizes.put(relative, affixes.size()); // exact: 0
-                if (returnedResultSizes.get(relative) > 1) { // Means we found exactly one match for this end affix.
-                  continue;
-                } else if (returnedResultSizes.get(exact) == 0 && returnedResultSizes.get(relative) == 0) {
-                  // This means searching from the middle and end couldn't find any valid affix or root. For example hypothetically imagine if 'emia' wasn't in the database.
-                  // Later I will work on getting this to actually keep going and read more sophisticated from right to left to keep finding terms from the middle if possible
-                  // But for now, since this is exceptionally rare, I will just make it give up on the middle and end. so  'hypo' would be found, but 'volemia' would return null.
-                  return makeMap(term, possibleAnswers);
-                }
-              }
-              // remove 'emia' from newTerm and keep going backwards. 'volemia' becomes 'vol' 'nalgesic' becomes 'n'
-//              subTerm = possibleAnswers.get(possibleAnswers.size());
-              // This code should run if 1 or more exact affixes are found, or if exactly 1 related affix is found
-              subTerm = chooseCorrectVariation(findVariations(affixes.get(0)), subTerm);
-              isValid = determineIfValid(subTerm, newTerm); //TODO: Add this section to prefix and middle word sections.
-              if (isValid) {
-                newTerm = newTerm.replace(subTerm, "");  // 'hypovolemia' becomes 'volemia'
-                possibleAnswers.add(subTerm);  // [ hypo, null, 'ia' ]
-                j = newTerm.length();
-              }
-            }
-          } else {
-//            continue;   // Basically if > 1 exact or relative results exist for middle word then run through loop for next letter 'vol' in this case. Except vol won't happen like this since it gets caught in if statement above.
-            subTerm = chooseCorrectVariation(findVariations(affixes.get(0)), subTerm);
-            newTerm = newTerm.replace(subTerm, "");  // 'hypovolemia' becomes 'volemia'
-            possibleAnswers.add(subTerm);
-            i = 0;
-          }
-        }
+    final List<Affix> allPossibleAffixes = affixRepository.findByMedTerm(term);
+    ArrayList<String> orderedAffixes = sortAffixesByLength(allPossibleAffixes);
+    if (orderedAffixes == null) {
+      LOGGER.debug("This medical term returned no affixes.");
+      return null;
+    }
+    ArrayList<String> chosenAffixes = chooseAffixes(orderedAffixes, term);
+    final Map<String, List<Affix>> dissectedParts = makeMap(term, chosenAffixes);
+    LOGGER.info("\nResults:");
+    LOGGER.info(String.valueOf(dissectedParts.keySet()));
+    final Object[] arr = dissectedParts.keySet().toArray();
+    for (int i = 0; i < arr.length; i++) {
+      if (dissectedParts.get(arr[i]) != null) {
+        LOGGER.info(arr[i].toString());
+        LOGGER.info(dissectedParts.get(arr[i]).get(0).getMeaning());
+      } else {
+        LOGGER.info(arr[i].toString());
+        LOGGER.info("null");
       }
     }
-    return makeMap(term, possibleAnswers); // end it here
+    LOGGER.info("");
+    return dissectedParts;
   }
+
+  private ArrayList<String> chooseAffixes(ArrayList<String> orderedAffixes, String term) {
+    ArrayList<String> chosenAffixes = new ArrayList<>();
+    String newTerm = term;
+    // Start removing affixes from larges to smallest. That way, if a smaller affix removal doesn't make any change that
+    // means a larger affix already took care of it. So any affix that is successfully replaced is added to the chosen affixes list.
+    for (int i = orderedAffixes.size() - 1; i > 0; i--) {
+      if (newTerm.replace(orderedAffixes.get(i), "").length() != newTerm.length()) {
+        chosenAffixes.add(orderedAffixes.get(i));
+        newTerm = newTerm.replace(orderedAffixes.get(i), "");
+      } else {
+        continue;
+      }
+    }
+    return chosenAffixes;
+  }
+
+  private ArrayList<String> sortAffixesByLength(List<Affix> allPossibleAffixes) {
+    if (allPossibleAffixes.size() == 0) {
+      return null;
+    }
+    ArrayList<String> affixes = new ArrayList<>();
+    int[] affixesLength = new int[allPossibleAffixes.size()];
+    for (int i = 0; i < allPossibleAffixes.size(); i++) {
+      allPossibleAffixes.get(i).getReadableAffix().length();
+      affixes.add(allPossibleAffixes.get(i).getReadableAffix()); // Makes a list of readable affixes
+      affixesLength[i] = affixes.get(i).length();                // Makes a array of lengths for each affix.
+    }
+    // Using the list of affixes and the list of lengths sort the lists to be largest to smallest.
+    int minNum = affixesLength[0];
+    String minWord = affixes.get(0);
+    int minIndex = 0;
+    boolean smallerFound = false;
+    for (int j = 0; j < affixesLength.length - 1; j++) {
+      for (int i = j; i < affixesLength.length; i++) {
+        if (affixesLength[i] < minNum) {
+          minNum = affixesLength[i];
+          minWord = affixes.get(i);
+          minIndex = i;
+          smallerFound = true;
+        }
+      }
+      if (smallerFound == true) {
+        affixesLength[minIndex] = affixesLength[j];
+        affixes.set(minIndex, affixes.get(j));
+        affixesLength[j] = minNum;
+        affixes.set(j, minWord);
+        smallerFound = false;
+      }
+      minNum = affixesLength[j + 1];
+      minWord = affixes.get(j + 1);
+    }
+    LOGGER.info(Arrays.toString(affixesLength));
+    LOGGER.info(affixes.toString());
+    return affixes;
+  }
+
+/*
+    // This method finds all the ranges of each affix and tries to check which ones overlap each other.
+    int start = 0;
+    int end = 0;
+    int start2 = 0;
+    int end2 = 0;
+    Map<String, List<Integer>> ranges = new HashMap<>();
+    for (int i = 0; i < allPossibleAffixes.size(); i++) {
+      affixName = allPossibleAffixes.get(i).getReadableAffix();
+      start = term.indexOf(affixName);     // 'hypo' would be 0
+      end = term.lastIndexOf(affixName);   // 'hypo' would be 3
+      ranges.put(affixName, List.of(start, end));
+    }
+    //find all the affixes which overlap each other:
+    for (int i = 0; i < ranges.size() - 1; i++) {
+      start = ranges.get(i).get(0);
+      end = ranges.get(i).get(1);
+      start2 = ranges.get(i + 1).get(0);
+      end2 = ranges.get(i + 1).get(1);
+      if (start >= start2 && start <= end2 || end <= end2 && end >= start2) { // this checks if any affix overlaps.
+      } else {
+      }
+//      chosenAffixes.add(allPossibleAffixes.get(i).getReadableAffix());
+    }
+*/
 
   private Boolean determineIfValid(String subTerm, String newTerm) {
     if (newTerm.contains(subTerm)) {
@@ -146,14 +165,14 @@ public class AffixService {
     for (int i = 0; i < arr.length; i++) {
       if (i == 0 && arr[i] != null) { // check if it 100% is a prefix.
         // Adds a list of the exact matches in database. Most cases there will only be one match, but sometimes there are 2.
-        affixes = affixRepository.findByExactAffix(arr[i], true);
+        affixes = affixRepository.findByExactAffix(arr[i]);
         if (affixes.size() == 0) {
           map.put(arr[i], null);
         } else {
           map.put(arr[i], affixes);
         }
       } else if (arr[i] != null) {
-        affixes = affixRepository.findByExactAffix(arr[i], false);
+        affixes = affixRepository.findByExactAffix(arr[i]);
         if (affixes.size() == 0) {
           map.put(arr[i], null);
         } else {
@@ -163,27 +182,6 @@ public class AffixService {
     }
     return map;
   }
-/*
-    Map<String, Integer> correctOrderOfParts = new HashMap<>();
-    for (int i = 0; i < possibleAnswers.size(); i++) {
-      // Get the index of each possible answer and put results in a map.
-      correctOrderOfParts.put(possibleAnswers.get(i), term.indexOf(possibleAnswers.get(i)));
-    }
-    // Sort the map so that each part appears in ascending index order.
-    for (int i = 0; i < correctOrderOfParts.size(); i++) {
-      if (correctOrderOfParts.)
-    }
-*/
-
-
-  // Make code that resets to beginning of the word if it fails. Example: i = 1; newTerm = term;
-  // Or you can just make it return null for the final affix instead. In fact, perhaps it would be best if a
-  // affix doesn't exist in the database, it just returns null, then if the user thinks that the affix is not
-  // including the right number of words, they can click try again, and this time a flag is raised which makes the
-  // method do things slightly different, instead of choosing the first option of the first affix, it checks the
-  // second possible option if that exists. If that doesn't exist, then the second option of the second affix will
-  // be used if that exists. Finally, if that doesn't exist, then it will return the exact same result to the user
-  // and then they can manually correct it using the form.
 
   private String chooseCorrectVariation(String[] variations, String subterm) {
     if (variations.length == 1) {  // if subterm = 'hyp' and variation[0] = 'hypo' it returns 'hypo'.
@@ -224,50 +222,3 @@ public class AffixService {
 
 
 }
-
-/*
-  public Map<String, List<Affix>> dissect(String term) {
-    List<Affix> affixes;
-    List<Affix> matches;
-    Map<String, List<Affix>> dissectedParts = new HashMap<>();
-    String subterm = "";
-    String originalTerm = term;
-    for (int i = 1; i <= term.length(); i++) {
-      if (term.length() == 1) {
-        return dissectedParts;
-      }
-      affixes = affixRepository.findByAffixStartsWith(term.substring(0, i), true);
-      if (affixes.size() == 1) {
-        String[] variations = findVariations(affixes.get(0));
-        if (variations.length > 1) {
-          for (int j = 0; j < variations.length; j++) {
-            if (variations[j] == term.substring(0, i)) {
-              subterm = term.substring(0, i);
-              dissectedParts.put(subterm, affixes);
-              term = term.substring(i);
-              break;
-            } else {
-              subterm = variations[0];
-              dissectedParts.put(subterm, affixes);
-              term = term.replace(subterm, "");
-              i = 0;
-            }
-          }
-        } else {
-          subterm = variations[0];
-          dissectedParts.put(subterm, affixes);
-          term = term.replace(subterm, "");
-          i = 0;
-        }
-      } else if (i == term.length()) {
-        matches = findMatches(affixes, term);
-        if (matches.isEmpty()) {
-          dissectedParts.put(subterm, affixes);   // Add all related records for the affix and let the user choose.
-        } else {
-          dissectedParts.put(subterm, matches); // Add all matching records for the affix and let the user choose if more than one exists.
-        }
-      }
-    }
-    return dissectedParts;
-  }
-*/
