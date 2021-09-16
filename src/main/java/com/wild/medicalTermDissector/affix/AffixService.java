@@ -28,19 +28,6 @@ public class AffixService {
     }
     ArrayList<String> chosenAffixes = chooseAffixes(orderedAffixes, term);
     final Map<String, List<Affix>> dissectedParts = makeMap(term, chosenAffixes);
-    LOGGER.info("\nResults:");
-    LOGGER.info(String.valueOf(dissectedParts.keySet()));
-    final Object[] arr = dissectedParts.keySet().toArray();
-    for (int i = 0; i < arr.length; i++) {
-      if (dissectedParts.get(arr[i]) != null) {
-        LOGGER.info(arr[i].toString());
-        LOGGER.info(dissectedParts.get(arr[i]).get(0).getMeaning());
-      } else {
-        LOGGER.info(arr[i].toString());
-        LOGGER.info("null");
-      }
-    }
-    LOGGER.info("");
     return dissectedParts;
   }
 
@@ -220,5 +207,21 @@ public class AffixService {
       .split(",");  // At this point -algia, alg(i)o- would become { algia, algio } so now it's easier to compare to term.substring(0, i)
   }
 
-
+  public void printDissectedParts(Map<String, List<Affix>> dissectedParts) {
+    System.out.println("\nResults:");
+    System.out.println(dissectedParts.keySet());
+    final Object[] arr = dissectedParts.keySet().toArray();
+    for (int i = 0; i < arr.length; i++) {
+      System.out.println("\naffix: " + arr[i]);
+      if (dissectedParts.get(arr[i]) != null) {
+        for (int j = 0; j < dissectedParts.get(arr[i]).size(); j++) {
+          System.out.println("meaning #" + (j+1) + ": " + dissectedParts.get(arr[i]).get(j).getMeaning());
+          System.out.println("examples #" + (j+1) + ": " + dissectedParts.get(arr[i]).get(j).getExamples());
+        }
+      } else {
+        System.out.println("null");
+      }
+    }
+    System.out.println("");
+  }
 }

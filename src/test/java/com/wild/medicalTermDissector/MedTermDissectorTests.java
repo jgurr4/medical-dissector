@@ -171,15 +171,15 @@ class MedTermDissectorTests {
     for (Map.Entry<String, List<Affix>> me : dissectedParts.entrySet()) {
       System.out.println(
         "affix: " + dissectedParts.get(me.getKey()).get(0).getAffix() + "\n" +
-        "meaning: " + dissectedParts.get(me.getKey()).get(0).getMeaning() + "\n" +
-        "examples: " + dissectedParts.get(me.getKey()).get(0).getExamples() + "\n"
+          "meaning: " + dissectedParts.get(me.getKey()).get(0).getMeaning() + "\n" +
+          "examples: " + dissectedParts.get(me.getKey()).get(0).getExamples() + "\n"
       );
     }
     assertEquals("hyp(o)-", dissectedParts.get("hypo").get(0).getAffix());
     assertEquals("below normal", dissectedParts.get("hypo").get(0).getMeaning());
   }
 
-/*
+
   @Test
   public void testMissingAffix() {
     // Ideally this should return "hypo: lack of, vol: null, emia: blood"
@@ -187,122 +187,49 @@ class MedTermDissectorTests {
     // algorithm can handle missing parts from any part of the word.
     String term = "hypovolemia";
     Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
-    printDissectedParts(dissectedParts);
+    affixService.printDissectedParts(dissectedParts);
     assertNull(dissectedParts.get("vol"));
   }
-*/
+
 
 /*
   @Test
-  public void testMultipleWords() {
-  // This also tests how the algorithm handles more than one root/affix in a word.
+  public void testMultipleWords() { // This should also test how the algorithm handles more than one root/affix in a word.
+    //FIXME: The dissect method needs to distinguish between separate words, and it also needs to not combine the outer edges of a found affix into one entry, it should keep them as seaprate values and make them both null.
     String term = "Sphenopalatine Ganglioneuralgia";
+    Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
+    affixService.printDissectedParts(dissectedParts);
   }
 */
 
-/*
   @Test
   public void testTwoLetterParentheses() {
-    // "-alge(si)" is a affix with double letter parentheses. (COMPLETE)
-
-    // Furthermore a-, an-, and ana- are all real affixes, but only one will work in this instance.
-    // How can algorithm choose the correct one every time? Answer: The algorithm needs to choose the smallest one and
-    // then check if the next part of the word creates a complete affix on its own, or if it only can do so after
-    // reducing one of the letters from itself. If it must remove a letter from beginning then that means the beginning affix needs to add a letter.
-
-    // Also 'an-' actually appears twice in affix list because it has two different meanings based on context.
-    // In these instances it should return both affixes and let the user choose which one makes more sense.
-    // After the user chooses the one that makes the most sense, it should send me a message and then I will make the
-    // algorithm automatically choose that option for that word from then on. (HALF-COMPLETE)
-
-    // Also algesic is not a affix that exists. (c) is missing. How should it handle that?
-    // c is only one letter so it shouldn't even be considered a dissected part. (COMPLETE)
     String term = "analgesic";
     Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
-    printDissectedParts(dissectedParts);
+    affixService.printDissectedParts(dissectedParts);
     assertEquals("not, without (alpha privative)", dissectedParts.get("an").get(0).getMeaning());
+/*
+ // FIXME: Every example column assert still returns an extra newline character that is not visible in mysql for some reason.
+    assertEquals("analgesic, apathy", dissectedParts.get("an").get(0).getExamples());
     assertEquals("anal", dissectedParts.get("an").get(1).getExamples());
-
-  }
 */
 
-/*
+  }
+
+  //FIXME: This test will work better if I decide to add base words with their definitions to the affix_view table.
   @Test
   public void testRootWord() {
     String term = "antibody";
     AffixService affixService = new AffixService(affixRepository);
     Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
-*/
-/*
-    List<Affix> dissectedParts = affixService.dissect(term);
-    System.out.println(dissectedParts.get(0).getAffix());
-    System.out.println("meaning: " + dissectedParts.get(0).getMeaning());
-    System.out.println(dissectedParts.get(1).getAffix());
-    System.out.println("meaning: " + dissectedParts.get(1).getMeaning());
-    System.out.println(dissectedParts.get(2).getAffix());
-    System.out.println("meaning: " + dissectedParts.get(2).getMeaning());
-    System.out.println(dissectedParts.get(0).getExamples());
-    assertEquals("an-", dissectedParts.get(0).getAffix());
-    assertEquals("anus", dissectedParts.get(0).getMeaning()); //"an-"
-    assertEquals("pain", dissectedParts.get(1).getMeaning()); //"alge(si)"
-    assertEquals(null, dissectedParts.get(2)); //"c"
-*//*
-
+    affixService.printDissectedParts(dissectedParts);
+//    assertEquals("", dissectedParts.get("body").get(0).getMeaning());
   }
-*/
 
-
-  // Use this in methods which test dissect method in order to print out the results.
-  private void printDissectedParts(Map<String, List<Affix>> dissectedParts) {
-    System.out.println("\nResults:");
-    System.out.println(dissectedParts.keySet());
-    final Object[] arr = dissectedParts.keySet().toArray();
-    for (int i = 0; i < arr.length; i++) {
-      if (dissectedParts.get(arr[i]) != null) {
-        System.out.println(arr[i]);
-        System.out.println(dissectedParts.get(arr[i]).get(0).getMeaning());
-      } else {
-        System.out.println(arr[i]);
-        System.out.println("null");
-      }
-    }
-    System.out.println("");
-  }
 }
 
-/*
-  @Test
-  public void customMysqlQueryTest() {
-
-  }
-*/
-
-/* //FIXME: This is a good test for normal Java, but in spring it won't work due to the fact spring tests require very special handling, especially due to spring dependency injection preventing normal unit and integration tests from working.
-  @Test   // Source: https://examples.javacodegeeks.com/core-java/java-11-standardized-http-client-api-example/
-  public void httpPostTest() throws IOException, InterruptedException {
-    HttpClient client = HttpClient.newHttpClient();
-    HttpRequest request = HttpRequest.newBuilder()
-      .uri(URI.create("http://localhost:8080/api/student"))
-      .timeout(Duration.ofSeconds(15))
-      .header("Content-Type", "application/json")
-      .POST(HttpRequest.BodyPublishers.ofString("name=betsy&email=betsy@mail.com&dob=1992-08-06"))  // HttpRequest.BodyPublishers.ofFile(Paths.get("file.json")) This is how to get from a file instead of string.
-      .build();
-    HttpResponse response = client.send(request, HttpResponse.BodyHandlers.discarding());
-    assertTrue(response.statusCode() == 201, "Status Code is not Created");
-  }
 
 
-  @Test
-    public void httpGetTest() {
-    HttpClient client = HttpClient.newBuilder()
-      .version(HttpClient.Version.HTTP_2)
-      .followRedirects(HttpClient.Redirect.NORMAL)
-      .connectTimeout(Duration.ofSeconds(10))
-//      .proxy(ProxySelector.of(new InetSocketAddress("www-proxy.com", 8080)))
-      .authenticator(Authenticator.getDefault())
-      .build();
-  }
-*/
 
 // This is only if you are using the persistence.xml, which this project doesn't use.
 //  @Test
@@ -329,7 +256,3 @@ class MedTermDissectorTests {
 //    assertTrue(studentService.getStudent(email).isPresent());
 //  }
 
-//  @Test
-//  public void GetStudentFail() {
-//
-//  }
