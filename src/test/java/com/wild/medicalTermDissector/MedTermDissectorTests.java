@@ -54,6 +54,7 @@ class MedTermDissectorTests {
     assertTrue(output.toString().contains("mariadb"));
   }
 
+/*
   @Test
   public void getMedTermsTest() {
     Boolean returnedList = true;
@@ -130,6 +131,7 @@ class MedTermDissectorTests {
     }
     assertFalse(testFailed);
   }
+*/
 
   @Test
   public void makeMapSuccess() {
@@ -138,19 +140,7 @@ class MedTermDissectorTests {
     possibleAnswers.add("emia");
     possibleAnswers.add("hypo");
     final Map<String, List<Affix>> dissectedParts = affixService.makeMap(term, possibleAnswers);
-    System.out.println("\nResults:");
-    System.out.println(dissectedParts.keySet());
-    final Object[] arr = dissectedParts.keySet().toArray();
-    for (int i = 0; i < arr.length; i++) {
-      if (dissectedParts.get(arr[i]) != null) {
-        System.out.println(arr[i]);
-        System.out.println(dissectedParts.get(arr[i]).get(0).getMeaning());
-      } else {
-        System.out.println(arr[i]);
-        System.out.println("null");
-      }
-    }
-    System.out.println("");
+    affixService.printDissectedParts(dissectedParts);
     assertNull(dissectedParts.get("vol"));
   }
 
@@ -182,25 +172,11 @@ class MedTermDissectorTests {
 
   @Test
   public void testMissingAffix() {
-    // Ideally this should return "hypo: lack of, vol: null, emia: blood"
-    // I should probably make testMissingPrefix and testMissingSuffix as well. Just so I can make sure
-    // algorithm can handle missing parts from any part of the word.
     String term = "hypovolemia";
     Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
     affixService.printDissectedParts(dissectedParts);
     assertNull(dissectedParts.get("vol"));
   }
-
-
-/*
-  @Test
-  public void testMultipleWords() { // This should also test how the algorithm handles more than one root/affix in a word.
-    //FIXME: The dissect method needs to distinguish between separate words, and it also needs to not combine the outer edges of a found affix into one entry, it should keep them as seaprate values and make them both null.
-    String term = "Sphenopalatine Ganglioneuralgia";
-    Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
-    affixService.printDissectedParts(dissectedParts);
-  }
-*/
 
   @Test
   public void testTwoLetterParentheses() {
@@ -213,18 +189,48 @@ class MedTermDissectorTests {
     assertEquals("analgesic, apathy", dissectedParts.get("an").get(0).getExamples());
     assertEquals("anal", dissectedParts.get("an").get(1).getExamples());
 */
-
   }
 
-  //FIXME: This test will work better if I decide to add base words with their definitions to the affix_view table.
+  @Test
+  public void testBetweenMissingAffixes() {  // This also tests Capital letters.
+    String term = "Ganglioneuralgia";
+    Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
+    affixService.printDissectedParts(dissectedParts);
+    assertNull(dissectedParts.get("g"));
+    assertNull(dissectedParts.get("glio"));
+    assertEquals("of or pertaining to nerves and the nervous system", dissectedParts.get("neur").get(0).getMeaning());
+//    assertEquals("neurofibromatosis", dissectedParts.get("neur").get(0).getExamples());
+  }
+
+/*
+  //TODO: This test will work better if I decide to add base words with their definitions to the affix_view table.
   @Test
   public void testRootWord() {
     String term = "antibody";
     AffixService affixService = new AffixService(affixRepository);
     Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
     affixService.printDissectedParts(dissectedParts);
-//    assertEquals("", dissectedParts.get("body").get(0).getMeaning());
+//    assertEquals("the main, central, or principal part", dissectedParts.get("body").get(0).getMeaning());
   }
+*/
+
+/*
+  //TODO: Find a word that repeats a affix and place it here. (If one exists. It might not exist)
+  @Test
+  public void testRepeatedAffixes() {
+    String term = "";
+  }
+*/
+
+/*
+  @Test
+  public void testMultipleWords() {
+    //TODO: The dissect method should be able to distinguish between separate words, and it also needs to not combine the outer edges of a found affix into one entry, it should keep them as seaprate values and make them both null.
+    String term = "Sphenopalatine Ganglioneuralgia";
+    Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
+    affixService.printDissectedParts(dissectedParts);
+  }
+*/
 
 }
 
