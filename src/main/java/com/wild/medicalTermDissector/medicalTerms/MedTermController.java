@@ -1,5 +1,6 @@
 package com.wild.medicalTermDissector.medicalTerms;
 
+import com.webfirmframework.wffweb.tag.html.Html;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +15,11 @@ public class MedTermController {
   @Autowired
   public MedTermController(MedTermService medTermService) {
     this.medTermService = medTermService;
+  }
+
+  @RequestMapping("/index")
+  public String index() {
+    return medTermService.generateIndexPage();
   }
 
   @GetMapping

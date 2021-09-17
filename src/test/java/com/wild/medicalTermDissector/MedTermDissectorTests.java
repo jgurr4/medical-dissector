@@ -54,7 +54,6 @@ class MedTermDissectorTests {
     assertTrue(output.toString().contains("mariadb"));
   }
 
-/*
   @Test
   public void getMedTermsTest() {
     Boolean returnedList = true;
@@ -131,7 +130,6 @@ class MedTermDissectorTests {
     }
     assertFalse(testFailed);
   }
-*/
 
   @Test
   public void makeMapSuccess() {
@@ -209,6 +207,15 @@ class MedTermDissectorTests {
     assertThrows(IllegalArgumentException.class, () -> {
       affixService.dissect(term);
     });
+  }
+
+  //TODO: Get term definition lookup working for makeMap/dissect method, so you can test that here too.
+  @Test
+  public void testTermDefinitionAndSpecialChars() {
+    String term = "hypogl*y@/c&emia";
+    Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
+    affixService.printDissectedParts(dissectedParts);
+//    assertEquals("An abnormally low level of glucose in the blood.", dissectedParts.get(term.trim().replaceAll("[^a-zA-Z]", "").toLowerCase(Locale.ROOT)).get(0).getMeaning());
   }
 
 /*

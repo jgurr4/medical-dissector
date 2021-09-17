@@ -1,5 +1,8 @@
 package com.wild.medicalTermDissector.medicalTerms;
 
+import com.webfirmframework.wffweb.tag.html.*;
+import com.webfirmframework.wffweb.tag.html.metainfo.Head;
+import com.webfirmframework.wffweb.tag.htmlwff.NoTag;
 import com.wild.medicalTermDissector.affix.Affix;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,5 +58,18 @@ public class MedTermService {
     return medTermRepository.findByNameStartsWith(letters);
   }
 
+  public String generateIndexPage() {
+    Html rootTag = new Html(null).give(html -> {
+      new Head(html);
+      new Body(html).give(body -> {
+        new NoTag(body, "Hello World");
+      });
+
+    });
+// prepends the doc type <!DOCTYPE html>
+    rootTag.setPrependDocType(true);
+    System.out.println(rootTag.toHtmlString(true));
+    return rootTag.toHtmlString(true);
+  }
 
 }
