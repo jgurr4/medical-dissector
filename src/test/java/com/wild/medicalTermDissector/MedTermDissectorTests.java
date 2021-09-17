@@ -202,6 +202,15 @@ class MedTermDissectorTests {
 //    assertEquals("neurofibromatosis", dissectedParts.get("neur").get(0).getExamples());
   }
 
+  @Test
+  public void testMultipleWords() {
+    //TODO: Eventually you might want to make it possible for dissect to handle multiple words.
+    String term = "Sphenopalatine Ganglioneuralgia";
+    assertThrows(IllegalArgumentException.class, () -> {
+      affixService.dissect(term);
+    });
+  }
+
 /*
   //TODO: This test will work better if I decide to add base words with their definitions to the affix_view table.
   @Test
@@ -219,16 +228,6 @@ class MedTermDissectorTests {
   @Test
   public void testRepeatedAffixes() {
     String term = "";
-  }
-*/
-
-/*
-  @Test
-  public void testMultipleWords() {
-    //TODO: The dissect method should be able to distinguish between separate words, and it also needs to not combine the outer edges of a found affix into one entry, it should keep them as seaprate values and make them both null.
-    String term = "Sphenopalatine Ganglioneuralgia";
-    Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
-    affixService.printDissectedParts(dissectedParts);
   }
 */
 

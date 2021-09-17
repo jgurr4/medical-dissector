@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Array;
 import java.util.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +21,11 @@ public class AffixService {
   }
 
   public Map<String, List<Affix>> dissect(String term) {
-    term = term.toLowerCase(Locale.ROOT);
+    term = term.trim();
+    if (term.contains(" ")) {
+      throw new IllegalArgumentException("Multiple words cannot be dissected. Please only type one word at a time.");
+    }
+    term = term.replaceAll("[^a-zA-Z]", "").toLowerCase(Locale.ROOT);
     final List<Affix> allPossibleAffixes = affixRepository.findByMedTerm(term);
     if (allPossibleAffixes.size() == 0) {
       LOGGER.debug("This medical term returned no affixes.");
@@ -48,38 +53,39 @@ public class AffixService {
 
   private ArrayList<String> sortAffixesByLength(List<Affix> allPossibleAffixes) {
     ArrayList<String> affixes = new ArrayList<>();
-    int[] affixesLength = new int[allPossibleAffixes.size()];
+    int[] affixLengths = new int[allPossibleAffixes.size()];
     for (int i = 0; i < allPossibleAffixes.size(); i++) {
       allPossibleAffixes.get(i).getReadableAffix().length();
       affixes.add(allPossibleAffixes.get(i).getReadableAffix());
-      affixesLength[i] = affixes.get(i).length();
+      affixLengths[i] = affixes.get(i).length();
     }
-    int minNum = affixesLength[0];
+    int minNum = affixLengths[0];
     String minWord = affixes.get(0);
     int minIndex = 0;
     boolean smallerFound = false;
-    for (int j = 0; j < affixesLength.length - 1; j++) {
-      for (int i = j; i < affixesLength.length; i++) {
-        if (affixesLength[i] < minNum) {
-          minNum = affixesLength[i];
+    for (int j = 0; j < affixLengths.length - 1; j++) {
+      for (int i = j; i < affixLengths.length; i++) {
+        if (affixLengths[i] < minNum) {
+          minNum = affixLengths[i];
           minWord = affixes.get(i);
           minIndex = i;
           smallerFound = true;
         }
       }
       if (smallerFound == true) {
-        affixesLength[minIndex] = affixesLength[j];
+        affixLengths[minIndex] = affixLengths[j];
         affixes.set(minIndex, affixes.get(j));
-        affixesLength[j] = minNum;
+        affixLengths[j] = minNum;
         affixes.set(j, minWord);
         smallerFound = false;
       }
-      minNum = affixesLength[j + 1];
+      minNum = affixLengths[j + 1];
       minWord = affixes.get(j + 1);
     }
     return affixes;
   }
 
+  //TODO: Make this add the original term as well as it's definition along with the affixes and their definitions.
   public Map<String, List<Affix>> makeMap(String term, ArrayList<String> possibleAnswers) {
     if (possibleAnswers.size() == 0) {
       throw new IllegalArgumentException("no value present in ArrayList");
@@ -130,6 +136,7 @@ public class AffixService {
     return map;
   }
 
+  //TODO: Make this print out the original term and it's definition as well as printing all the affixes and their definitions.
   public void printDissectedParts(Map<String, List<Affix>> dissectedParts) {
     System.out.println("\nResults:");
     System.out.println(dissectedParts.keySet());
@@ -138,8 +145,8 @@ public class AffixService {
       System.out.println("\naffix: " + arr[i]);
       if (dissectedParts.get(arr[i]) != null) {
         for (int j = 0; j < dissectedParts.get(arr[i]).size(); j++) {
-          System.out.println("meaning #" + (j+1) + ": " + dissectedParts.get(arr[i]).get(j).getMeaning());
-          System.out.println("examples #" + (j+1) + ": " + dissectedParts.get(arr[i]).get(j).getExamples());
+          System.out.println("meaning #" + (j + 1) + ": " + dissectedParts.get(arr[i]).get(j).getMeaning());
+          System.out.println("examples #" + (j + 1) + ": " + dissectedParts.get(arr[i]).get(j).getExamples());
         }
       } else {
         System.out.println("null");
@@ -147,4 +154,5 @@ public class AffixService {
     }
     System.out.println("");
   }
+
 }
