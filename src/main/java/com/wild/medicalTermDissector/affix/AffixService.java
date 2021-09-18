@@ -34,6 +34,13 @@ public class AffixService {
     final ArrayList<String> orderedAffixes = sortAffixesByLength(allPossibleAffixes);
     final ArrayList<String> chosenAffixes = chooseAffixes(orderedAffixes, term);
     final Map<String, List<Affix>> dissectedParts = makeMap(term, chosenAffixes);
+/*
+    List<Affix> termDefinition = affixRepository.findByMedTerm(term);
+    if (termDefinition.size() == 0) {
+      //TODO: Put a method here which looks online for definition of the word and puts it in a List<Affix> format.
+    }
+    map.put(term, termDefinition);
+*/
     return dissectedParts;
   }
 
@@ -102,13 +109,6 @@ public class AffixService {
       }
     }
     Map<String, List<Affix>> map = new LinkedHashMap<>();
-/*
-    List<Affix> termDefinition = affixRepository.findByMedTerm(term);
-    if (termDefinition.size() == 0) {
-      //TODO: Put a method here which looks online for definition of the word and puts it in a List<Affix> format.
-    }
-    map.put(term, termDefinition);
-*/
     String[] arr = possibleAnswers.toArray(new String[possibleAnswers.size()]);
     String minValue = arr[0];
     int minIndex = 0;
