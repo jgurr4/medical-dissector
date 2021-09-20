@@ -7,6 +7,7 @@ import com.webfirmframework.wffweb.tag.html.attribute.Type;
 import com.webfirmframework.wffweb.tag.html.attribute.Value;
 import com.webfirmframework.wffweb.tag.html.formsandinputs.Button;
 import com.webfirmframework.wffweb.tag.html.formsandinputs.Form;
+import com.webfirmframework.wffweb.tag.html.formsandinputs.Input;
 import com.webfirmframework.wffweb.tag.html.html5.Text;
 import com.webfirmframework.wffweb.tag.html.metainfo.Head;
 import com.webfirmframework.wffweb.tag.htmlwff.NoTag;
@@ -66,12 +67,13 @@ public class MedTermService {
     return medTermRepository.findByNameStartsWith(letters);
   }
 
-  public String generateIndexPage() {
+  public String generateIndexPage() { // TODO: This needs to generate javascript which takes the json and changes the webpage accordingly. Use a java web framework of some kind.
     Html rootTag = new Html(null).give(html -> {
       new Head(html);
       new Body(html).give(body -> {
         new NoTag(body, "Hello World");
-        Form form = new Form(body, new Method(Method.GET), new Action("/api/term/dissect/hypoglycemia"));
+        Form form = new Form(body, new Method(Method.POST), new Action("/api/term/dissect"));
+        new Input(form, new Value("type word here"));
         Button button = new Button(form, new Type("submit"));
         new Br(form);
         new NoTag(button, "click me");

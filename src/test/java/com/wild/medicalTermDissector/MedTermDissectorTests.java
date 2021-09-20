@@ -3,6 +3,7 @@ package com.wild.medicalTermDissector;
 
 import com.wild.medicalTermDissector.affix.Affix;
 import com.wild.medicalTermDissector.affix.AffixRepository;
+import com.wild.medicalTermDissector.affix.AffixResult;
 import com.wild.medicalTermDissector.affix.AffixService;
 import com.wild.medicalTermDissector.medicalTerms.MedTerm;
 import com.wild.medicalTermDissector.medicalTerms.MedTermRepository;
@@ -132,14 +133,14 @@ class MedTermDissectorTests {
   }
 
   @Test
-  public void makeMapSuccess() {
+  public void makeMapSuccess() throws NoSuchFieldException, IllegalAccessException {
     final String term = "hypovolemia";
     final ArrayList<String> possibleAnswers = new ArrayList<>();
     possibleAnswers.add("emia");
     possibleAnswers.add("hypo");
-    final Map<String, List<Affix>> dissectedParts = affixService.makeMap(term, possibleAnswers);
+    final AffixResult dissectedParts = affixService.makeMap(term, possibleAnswers);
     affixService.printDissectedParts(dissectedParts);
-    assertNull(dissectedParts.get("vol"));
+    assertNull(dissectedParts.affixMap.get("vol"));
   }
 
   @Test
@@ -154,55 +155,53 @@ class MedTermDissectorTests {
   @Test
   public void dissectSuccess() {
     String term = "hypoglycemia";
-    Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
-    System.out.println("keyset: " + dissectedParts.keySet() + "\n");
-    for (Map.Entry<String, List<Affix>> me : dissectedParts.entrySet()) {
+    AffixResult dissectedParts = affixService.dissect(term);
+    System.out.println("keyset: " + dissectedParts.affixMap.keySet() + "\n");
+    for (Map.Entry<String, List<Affix>> me : dissectedParts.affixMap.entrySet()) {
       System.out.println(
-        "affix: " + dissectedParts.get(me.getKey()).get(0).getAffix() + "\n" +
-          "meaning: " + dissectedParts.get(me.getKey()).get(0).getMeaning() + "\n" +
-          "examples: " + dissectedParts.get(me.getKey()).get(0).getExamples() + "\n"
+        "affix: " + dissectedParts.affixMap.get(me.getKey()).get(0).getAffix() + "\n" +
+          "meaning: " + dissectedParts.affixMap.get(me.getKey()).get(0).getMeaning() + "\n" +
+          "examples: " + dissectedParts.affixMap.get(me.getKey()).get(0).getExamples() + "\n"
       );
     }
-    assertEquals("hyp(o)-", dissectedParts.get("hypo").get(0).getAffix());
-    assertEquals("below normal", dissectedParts.get("hypo").get(0).getMeaning());
+    assertEquals("hyp(o)-", dissectedParts.affixMap.get("hypo").get(0).getAffix());
+    assertEquals("below normal", dissectedParts.affixMap.get("hypo").get(0).getMeaning());
   }
 
 
   @Test
   public void testMissingAffix() {
     String term = "hypovolemia";
-    Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
+    AffixResult dissectedParts = affixService.dissect(term);
     affixService.printDissectedParts(dissectedParts);
-    assertNull(dissectedParts.get("vol"));
+    assertNull(dissectedParts.affixMap.get("vol"));
   }
 
   @Test
   public void testTwoLetterParentheses() {
     String term = "analgesic";
-    Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
+    AffixResult dissectedParts = affixService.dissect(term);
     affixService.printDissectedParts(dissectedParts);
-    assertEquals("not, without (alpha privative)", dissectedParts.get("an").get(0).getMeaning());
-/*
- // FIXME: Every example column assert still returns an extra newline character that is not visible in mysql for some reason.
-    assertEquals("analgesic, apathy", dissectedParts.get("an").get(0).getExamples());
-    assertEquals("anal", dissectedParts.get("an").get(1).getExamples());
-*/
+    assertEquals("not, without (alpha privative)", dissectedParts.affixMap.get("an").get(0).getMeaning());
+    assertEquals("analgesic, apathy", dissectedParts.affixMap.get("an").get(0).getExamples());
+    assertEquals("anal", dissectedParts.affixMap.get("an").get(1).getExamples());
   }
 
   @Test
   public void testBetweenMissingAffixes() {  // This also tests Capital letters.
     String term = "Ganglioneuralgia";
-    Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
+    AffixResult dissectedParts = affixService.dissect(term);
     affixService.printDissectedParts(dissectedParts);
-    assertNull(dissectedParts.get("g"));
-    assertNull(dissectedParts.get("glio"));
-    assertEquals("of or pertaining to nerves and the nervous system", dissectedParts.get("neur").get(0).getMeaning());
+    assertNull(dissectedParts.affixMap.get("g"));
+    assertNull(dissectedParts.affixMap.get("glio"));
+    assertEquals("of or pertaining to nerves and the nervous system", dissectedParts.affixMap.get("neur").get(0).getMeaning());
 //    assertEquals("neurofibromatosis", dissectedParts.get("neur").get(0).getExamples());
   }
 
   @Test
   public void testMultipleWords() {
     //TODO: Eventually you might want to make it possible for dissect to handle multiple words.
+    //FIXME: Do not use exceptions for user input.
     String term = "Sphenopalatine Ganglioneuralgia";
     assertThrows(IllegalArgumentException.class, () -> {
       affixService.dissect(term);
@@ -213,7 +212,7 @@ class MedTermDissectorTests {
   @Test
   public void testTermDefinitionAndSpecialChars() {
     String term = "hypogl*y@/c&emia";
-    Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
+    AffixResult dissectedParts = affixService.dissect(term);
     affixService.printDissectedParts(dissectedParts);
 //    assertEquals("An abnormally low level of glucose in the blood.", dissectedParts.get(term.trim().replaceAll("[^a-zA-Z]", "").toLowerCase(Locale.ROOT)).get(0).getMeaning());
   }
@@ -224,7 +223,7 @@ class MedTermDissectorTests {
   public void testRootWord() {
     String term = "antibody";
     AffixService affixService = new AffixService(affixRepository);
-    Map<String, List<Affix>> dissectedParts = affixService.dissect(term);
+    AffixResult dissectedParts = affixService.dissect(term);
     affixService.printDissectedParts(dissectedParts);
 //    assertEquals("the main, central, or principal part", dissectedParts.get("body").get(0).getMeaning());
   }

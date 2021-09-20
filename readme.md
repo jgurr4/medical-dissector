@@ -10,6 +10,9 @@ hypoglycemia
 
 So based on this, you can understand that hypoglycemia means "lacking sugar in the blood".
 
+The real definition of hypoglycemia according to American Heritage Dictionary is: "An abnormally low level of glucose in the blood."
+So you can see the meaning of each part of the word hypoglycemia happens to match nearly perfectly with its full definition.
+
 ### Design Principles
 * An inversion of control pattern mostly done with dependency injection. (since inversion of control is central to Spring Framework design)
 * RESTful api.

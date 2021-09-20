@@ -2,10 +2,7 @@ package com.wild.medicalTermDissector.affix;
 
 import com.wild.medicalTermDissector.medicalTerms.MedTermService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -21,9 +18,17 @@ public class AffixController {
     this.affixService = affixService;
   }
 
-  @GetMapping(path = "/dissect/{term}")
-  public Map<String, List<Affix>> getDissectedTerm(@PathVariable("term") String term) {
+  @GetMapping(path = "/dissect/{term}")  // This takes variables from the url. That is how GET work.
+  public AffixResult getDissectedTerm(@PathVariable("term") String term) {
     return affixService.dissect(term);
   }
 
+  @PostMapping(path = "/dissect")  // This takes variables from the Body of the request. This is how POST work. //FIXME: Media type not supported
+  public AffixResult getDissectedTerm(@RequestBody() DissectForm form) {
+    return affixService.dissect(form.term);
+  }
+
+  private class DissectForm {
+    public String term;
+  }
 }

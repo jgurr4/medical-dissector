@@ -20,7 +20,7 @@ public class AffixService {
     this.affixRepository = affixRepository;
   }
 
-  public Map<String, List<Affix>> dissect(String term) {
+  public AffixResult dissect(String term) {
     term = term.trim();
     if (term.contains(" ")) {
       throw new IllegalArgumentException("Multiple words cannot be dissected. Please only type one word at a time.");
@@ -33,7 +33,7 @@ public class AffixService {
     }
     final ArrayList<String> orderedAffixes = sortAffixesByLength(allPossibleAffixes);
     final ArrayList<String> chosenAffixes = chooseAffixes(orderedAffixes, term);
-    final Map<String, List<Affix>> dissectedParts = makeMap(term, chosenAffixes);
+    final AffixResult dissectedParts = makeMap(term, chosenAffixes);
 /*
     List<Affix> termDefinition = affixRepository.findByMedTerm(term);
     if (termDefinition.size() == 0) {
@@ -93,7 +93,10 @@ public class AffixService {
   }
 
   //TODO: Make this add the original term as well as it's definition along with the affixes and their definitions.
-  public Map<String, List<Affix>> makeMap(String term, ArrayList<String> possibleAnswers) {
+  public AffixResult makeMap(String term, ArrayList<String> possibleAnswers) {
+    final AffixResult affixResult = new AffixResult();
+    affixResult.term = term;
+    affixResult.definition = findDefinition(term);
     if (possibleAnswers.size() == 0) {
       throw new IllegalArgumentException("no value present in ArrayList");
     }
@@ -140,26 +143,33 @@ public class AffixService {
         }
       }
     }
-    return map;
+    affixResult.affixMap = map;
+    return affixResult;
+  }
+
+  private String findDefinition(String term) {
+    // This method must look inside medTerm table and find the definition of the medical term. If it's not located in there,
+    // then this method must look online and find a definition and add it to the database.
+    return "definition goes here";
   }
 
   //TODO: Make this print out the original term and it's definition as well as printing all the affixes and their definitions.
-  public void printDissectedParts(Map<String, List<Affix>> dissectedParts) {
+  public void printDissectedParts(AffixResult dissectedParts) {
     System.out.println("\nResults:");
-    System.out.println(dissectedParts.keySet());
-    final Object[] arr = dissectedParts.keySet().toArray();
+    System.out.println(dissectedParts.affixMap.keySet());
+    final Object[] arr = dissectedParts.affixMap.keySet().toArray();
     for (int i = 0; i < arr.length; i++) {
       System.out.println("\naffix: " + arr[i]);
-      if (dissectedParts.get(arr[i]) != null) {
-        for (int j = 0; j < dissectedParts.get(arr[i]).size(); j++) {
-          System.out.println("meaning #" + (j + 1) + ": " + dissectedParts.get(arr[i]).get(j).getMeaning());
-          System.out.println("examples #" + (j + 1) + ": " + dissectedParts.get(arr[i]).get(j).getExamples());
+      if (dissectedParts.affixMap.get(arr[i]) != null) {
+        for (int j = 0; j < dissectedParts.affixMap.get(arr[i]).size(); j++) {
+          System.out.println("meaning #" + (j + 1) + ": " + dissectedParts.affixMap.get(arr[i]).get(j).getMeaning());
+          System.out.println("examples #" + (j + 1) + ": " + dissectedParts.affixMap.get(arr[i]).get(j).getExamples());
         }
       } else {
         System.out.println("null");
       }
     }
-    System.out.println("");
+    System.out.println("\nfull definition of " + dissectedParts.term + "is: " + dissectedParts.definition + "\n");
   }
 
 }
