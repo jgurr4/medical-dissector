@@ -26,31 +26,31 @@ public class AffixService {
       throw new IllegalArgumentException("Multiple words cannot be dissected. Please only type one word at a time.");
     }
     term = term.replaceAll("[^a-zA-Z]", "").toLowerCase(Locale.ROOT);
+    final AffixResult affixResult = new AffixResult();
+    affixResult.term = term;
+    affixResult.definition = findDefinition(term);
     final List<Affix> allPossibleAffixes = affixRepository.findByMedTerm(term);
     if (allPossibleAffixes.size() == 0) {
       LOGGER.debug("This medical term returned no affixes.");
-      return null;
+      Map<String, List<Affix>> map = new LinkedHashMap<>();
+      map.put(term, null);
+      affixResult.affixMap = map;
+      return affixResult;
     }
     final ArrayList<String> orderedAffixes = sortAffixesByLength(allPossibleAffixes);
     final ArrayList<String> chosenAffixes = chooseAffixes(orderedAffixes, term);
-    final AffixResult dissectedParts = makeMap(term, chosenAffixes);
-/*
-    List<Affix> termDefinition = affixRepository.findByMedTerm(term);
-    if (termDefinition.size() == 0) {
-      //TODO: Put a method here which looks online for definition of the word and puts it in a List<Affix> format.
-    }
-    map.put(term, termDefinition);
-*/
-    return dissectedParts;
+    final Map<String, List<Affix>> dissectedParts = makeMap(term, chosenAffixes);
+    affixResult.affixMap = dissectedParts;
+    return affixResult;
   }
 
   private ArrayList<String> chooseAffixes(ArrayList<String> orderedAffixes, String term) {
     ArrayList<String> chosenAffixes = new ArrayList<>();
     String newTerm = term;
-    for (int i = orderedAffixes.size() - 1; i > 0; i--) {
-      if (newTerm.replace(orderedAffixes.get(i), "").length() != newTerm.length()) {
-        chosenAffixes.add(orderedAffixes.get(i));
-        newTerm = newTerm.replace(orderedAffixes.get(i), "");
+    for (int i = orderedAffixes.size(); i > 0; i--) {
+      if (newTerm.replace(orderedAffixes.get(i-1), "").length() != newTerm.length()) {
+        chosenAffixes.add(orderedAffixes.get(i-1));
+        newTerm = newTerm.replace(orderedAffixes.get(i-1), "");
       } else {
         continue;
       }
@@ -92,16 +92,14 @@ public class AffixService {
     return affixes;
   }
 
-  //TODO: Make this add the original term as well as it's definition along with the affixes and their definitions.
-  public AffixResult makeMap(String term, ArrayList<String> possibleAnswers) {
-    final AffixResult affixResult = new AffixResult();
-    affixResult.term = term;
-    affixResult.definition = findDefinition(term);
-    if (possibleAnswers.size() == 0) {
-      throw new IllegalArgumentException("no value present in ArrayList");
-    }
+  public Map<String, List<Affix>> makeMap(String term, ArrayList<String> possibleAnswers) {
     List<Affix> affixes;
     String newTerm = term;
+    if (possibleAnswers.size() == 0) {
+      Map<String, List<Affix>> map = new LinkedHashMap<>();
+      map.put(term,null);
+      return map;
+    }
     for (int i = 0; i < possibleAnswers.size(); i++) {
       newTerm = newTerm.replace(possibleAnswers.get(i), " ").trim();
     }
@@ -143,8 +141,7 @@ public class AffixService {
         }
       }
     }
-    affixResult.affixMap = map;
-    return affixResult;
+    return map;
   }
 
   private String findDefinition(String term) {
@@ -169,7 +166,7 @@ public class AffixService {
         System.out.println("null");
       }
     }
-    System.out.println("\nfull definition of " + dissectedParts.term + "is: " + dissectedParts.definition + "\n");
+    System.out.println("\nfull definition of " + dissectedParts.term + ": " + dissectedParts.definition + "\n");
   }
 
 }

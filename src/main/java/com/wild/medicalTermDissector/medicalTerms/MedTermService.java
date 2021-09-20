@@ -1,14 +1,14 @@
 package com.wild.medicalTermDissector.medicalTerms;
 
 import com.webfirmframework.wffweb.tag.html.*;
-import com.webfirmframework.wffweb.tag.html.attribute.Action;
-import com.webfirmframework.wffweb.tag.html.attribute.Method;
-import com.webfirmframework.wffweb.tag.html.attribute.Type;
-import com.webfirmframework.wffweb.tag.html.attribute.Value;
+import com.webfirmframework.wffweb.tag.html.attribute.*;
+import com.webfirmframework.wffweb.tag.html.attribute.global.Id;
 import com.webfirmframework.wffweb.tag.html.formsandinputs.Button;
 import com.webfirmframework.wffweb.tag.html.formsandinputs.Form;
 import com.webfirmframework.wffweb.tag.html.formsandinputs.Input;
+import com.webfirmframework.wffweb.tag.html.formsandinputs.Label;
 import com.webfirmframework.wffweb.tag.html.html5.Text;
+import com.webfirmframework.wffweb.tag.html.html5.attribute.Placeholder;
 import com.webfirmframework.wffweb.tag.html.metainfo.Head;
 import com.webfirmframework.wffweb.tag.htmlwff.NoTag;
 import com.wild.medicalTermDissector.affix.Affix;
@@ -73,7 +73,8 @@ public class MedTermService {
       new Body(html).give(body -> {
         new NoTag(body, "Hello World");
         Form form = new Form(body, new Method(Method.POST), new Action("/api/term/dissect"));
-        new Input(form, new Value("type word here"));
+        new Label(form, new For("term"));
+        new Input(form, new Placeholder("type word here"), new Id("term"), new Name("term"));
         Button button = new Button(form, new Type("submit"));
         new Br(form);
         new NoTag(button, "click me");

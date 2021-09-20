@@ -133,23 +133,24 @@ class MedTermDissectorTests {
   }
 
   @Test
-  public void makeMapSuccess() throws NoSuchFieldException, IllegalAccessException {
+  public void makeMapSuccess() {
     final String term = "hypovolemia";
     final ArrayList<String> possibleAnswers = new ArrayList<>();
     possibleAnswers.add("emia");
     possibleAnswers.add("hypo");
-    final AffixResult dissectedParts = affixService.makeMap(term, possibleAnswers);
-    affixService.printDissectedParts(dissectedParts);
-    assertNull(dissectedParts.affixMap.get("vol"));
+    AffixResult affixResult = new AffixResult();
+    affixResult.term = term;
+    affixResult.affixMap = affixService.makeMap(term, possibleAnswers);
+    affixService.printDissectedParts(affixResult);
+    assertNull(affixResult.affixMap.get("vol"));
   }
 
   @Test
   public void makeMapFail() {
     final String term = "test";
     final ArrayList<String> possibleAnswers = new ArrayList<>();
-    assertThrows(IllegalArgumentException.class, () -> {
-      affixService.makeMap(term, possibleAnswers);
-    });
+    final Map<String, List<Affix>> dissectedParts = affixService.makeMap(term, possibleAnswers);
+    assertNull(dissectedParts.get("test"));
   }
 
   @Test
@@ -175,6 +176,22 @@ class MedTermDissectorTests {
     AffixResult dissectedParts = affixService.dissect(term);
     affixService.printDissectedParts(dissectedParts);
     assertNull(dissectedParts.affixMap.get("vol"));
+  }
+
+  @Test
+  public void testOneAffix() {
+    String term = "opium";
+    AffixResult dissectedParts = affixService.dissect(term);
+    affixService.printDissectedParts(dissectedParts);
+    assertNull(dissectedParts.affixMap.get("op"));
+  }
+
+  @Test
+  public void testNoMatches() {
+    String term = "op";
+    AffixResult dissectedParts = affixService.dissect(term);
+    affixService.printDissectedParts(dissectedParts);
+    assertNull(dissectedParts.affixMap.get("op"));
   }
 
   @Test
