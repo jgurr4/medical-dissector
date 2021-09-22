@@ -225,13 +225,21 @@ class MedTermDissectorTests {
     });
   }
 
-  //TODO: Get term definition lookup working for makeMap/dissect method, so you can test that here too.
   @Test
   public void testTermDefinitionAndSpecialChars() {
     String term = "hypogl*y@/c&emia";
     AffixResult dissectedParts = affixService.dissect(term);
     affixService.printDissectedParts(dissectedParts);
 //    assertEquals("An abnormally low level of glucose in the blood.", dissectedParts.get(term.trim().replaceAll("[^a-zA-Z]", "").toLowerCase(Locale.ROOT)).get(0).getMeaning());
+  }
+
+  //FIXME: This currently returns 'a' instead of 'an' and it also returns only 1 'a' instead of 2 which it should.
+  @Test
+  public void testRepeatingAffix() {
+    String term = "anesthesia";
+    AffixResult dissectedParts = affixService.dissect(term);
+    affixService.printDissectedParts(dissectedParts);
+    assertNull(dissectedParts.affixMap.get("esthesi"));
   }
 
 /*

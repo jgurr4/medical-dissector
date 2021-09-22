@@ -3,19 +3,23 @@ package com.wild.medicalTermDissector.medicalTerms;
 import com.webfirmframework.wffweb.tag.html.*;
 import com.webfirmframework.wffweb.tag.html.attribute.*;
 import com.webfirmframework.wffweb.tag.html.attribute.global.Id;
+import com.webfirmframework.wffweb.tag.html.attribute.global.Style;
 import com.webfirmframework.wffweb.tag.html.formsandinputs.Button;
 import com.webfirmframework.wffweb.tag.html.formsandinputs.Form;
 import com.webfirmframework.wffweb.tag.html.formsandinputs.Input;
 import com.webfirmframework.wffweb.tag.html.formsandinputs.Label;
-import com.webfirmframework.wffweb.tag.html.html5.Text;
+import com.webfirmframework.wffweb.tag.html.html5.Source;
 import com.webfirmframework.wffweb.tag.html.html5.attribute.Placeholder;
 import com.webfirmframework.wffweb.tag.html.metainfo.Head;
+import com.webfirmframework.wffweb.tag.html.programming.Script;
 import com.webfirmframework.wffweb.tag.htmlwff.NoTag;
-import com.wild.medicalTermDissector.affix.Affix;
-import org.dom4j.tree.AbstractAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.servlet.tags.form.AbstractHtmlElementBodyTag;
+import org.springframework.web.servlet.tags.form.ButtonTag;
 
+import javax.swing.text.html.HTML;
 import java.util.*;
 
 @Service
@@ -67,19 +71,26 @@ public class MedTermService {
     return medTermRepository.findByNameStartsWith(letters);
   }
 
-  public String generateIndexPage() { // TODO: This needs to generate javascript which takes the json and changes the webpage accordingly. Use a java web framework of some kind.
+  public String generateIndexPage() { // TODO: This needs to generate javascript/ajax which takes the json and changes the webpage accordingly. Use a java web framework of some kind.
     Html rootTag = new Html(null).give(html -> {
-      new Head(html);
+      Head head = new Head(html);
+      //FIXME: Find a way to add crossorigin attribute here. See reactjs cdn.
+      new Script(head, new Type("text/javascript"), new Src("https://unpkg.com/react@17/umd/react.production.min.js"), new Value("//put javascript code here to handle response data."));
+      new Script(head, new Type("text/javascript"), new Src("https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"), new Value("//put javascript code here to handle response data."));
+      new Script(head, new Type("text/javascript"), new Src("result.js"));
       new Body(html).give(body -> {
         new NoTag(body, "Hello World");
-        Form form = new Form(body, new Method(Method.POST), new Action("/api/term/dissect"));
-        new Label(form, new For("term"));
-        new Input(form, new Placeholder("type word here"), new Id("term"), new Name("term"));
-        Button button = new Button(form, new Type("submit"));
-        new Br(form);
+        new Br(body);
+        new Input(body, new Placeholder("type word here"), new Id("term"), new Name("term"));
+        Button button = new Button(body, new Id("driver"), new Type("submit"));
+        new Br(body);
         new NoTag(button, "click me");
+        P p = new P(body);
+        Id id = new Id("result");
+        Style style = new Style("color:green");
+        p.addAttributes(id, style);
+        p.addInnerHtml(new NoTag(p, "hello")); // Cannot figure this out yet.
       });
-
     });
 // prepends the doc type <!DOCTYPE html>
     rootTag.setPrependDocType(true);
