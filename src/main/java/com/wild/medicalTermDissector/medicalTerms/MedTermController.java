@@ -1,11 +1,9 @@
 package com.wild.medicalTermDissector.medicalTerms;
 
-import com.webfirmframework.wffweb.tag.html.Html;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping(path = "/api/term")
@@ -15,11 +13,6 @@ public class MedTermController {
   @Autowired
   public MedTermController(MedTermService medTermService) {
     this.medTermService = medTermService;
-  }
-
-  @RequestMapping("/index")
-  public String index() {
-    return medTermService.generateIndexPage();
   }
 
   @GetMapping
@@ -45,5 +38,3 @@ public class MedTermController {
   public void deleteMedTerm(@PathVariable("termId") Long termId) { medTermService.deleteMedTerm(termId);}
 
 }
-// @RequestParam is a useful way to set a default value in case a parameter is not given. Example:
-//  public List<Student> getStudents(@RequestParam(value = "name", defaultValue = "World") String name) {

@@ -22,7 +22,7 @@ public class AffixService {
 
   public AffixResult dissect(String term) {
     term = term.trim();
-    if (term.contains(" ")) {
+    if (term.contains(" ")) { //FIXME: Never throw exceptions for user input. Change this to return null value. Javascript frontend should do validation checking so this never happens.
       throw new IllegalArgumentException("Multiple words cannot be dissected. Please only type one word at a time.");
     }
     term = term.replaceAll("[^a-zA-Z]", "").toLowerCase(Locale.ROOT);
