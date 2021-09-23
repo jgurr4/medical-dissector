@@ -3,27 +3,34 @@ function showDissectedResults(data) {
     const affixMap = data.affixMap
     const term = data.term
     const definition = data.definition
+    const affixMapKeys = Object.keys(affixMap);
     const resultsDiv = document.getElementById("results");
-    const affixMapElement = document.createElement("p");
-    // affixMapElement.innerText = `${data.affixMap.algesi[0].affix}`;
-    const keys = Object.keys(affixMap);
-    console.log(keys)
-    for (let i = 0; i < keys.length; i++) {
-        console.log(keys[i])
-        let key = keys[i]
-        // console.log(affixMap[`${key}`])
+    console.log(affixMapKeys)
+    for (let i = 0; i < affixMapKeys.length; i++) {
+        const affixMapElement = document.createElement("p");
+        console.log(affixMapKeys[i])
+        affixMapElement.innerText = `${affixMapKeys[i]}`;
+        resultsDiv.append(affixMapElement);
+        let key = affixMapKeys[i]
         if (affixMap[`${key}`] !== null) {
             for (let j = 0; j < affixMap[`${key}`].length; j++) {
+                const affixMapElement = document.createElement("p");
                 console.log(affixMap[`${key}`][j].affix)
+                affixMapElement.innerText = affixMap[`${key}`][j].affix;
+                resultsDiv.append(affixMapElement);
+                const affixMapElement2 = document.createElement("p");
                 console.log(affixMap[`${key}`][j].meaning)
+                affixMapElement2.innerText = affixMap[`${key}`][j].meaning;
+                resultsDiv.append(affixMapElement2);
+                const affixMapElement3 = document.createElement("p");
                 console.log(affixMap[`${key}`][j].examples)
+                affixMapElement3.innerText = affixMap[`${key}`][j].examples;
+                resultsDiv.append(affixMapElement3);
             }
         } else {
             console.log(key + " is null")
         }
     }
-    affixMapElement.innerText = `${JSON.stringify(data)}`;
-    resultsDiv.append(affixMapElement);
 }
 
 function obtainJson() {
