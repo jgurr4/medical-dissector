@@ -1,0 +1,44 @@
+body {
+}
+
+*{
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 76rem;
+    height: 26rem;
+    margin: auto;
+    margin-top:3rem;
+    position : relative;
+    /*background: linear-gradient(to right,aqua,rgb(125, 14, 80));*/
+    outline: .1rem solid black;
+    /*outline-offset: 1rem;*/
+}
+
+.submitWord {
+    position: absolute;
+    bottom: 25%;
+    width: 50%;
+    left: 25%;
+}
+
+.textbox {
+    width: 75%;
+    font-size: 1.5rem;
+}
+
+.submitbtn {
+    width: 20%;
+    font-size: 1.5rem;
+    font-weight: lighter;
+}
+
+.text {
+    position: absolute;
+    margin: auto;
+    font-size: 1.5rem;
+    left: 15%;
+    top: 10%;
+}
