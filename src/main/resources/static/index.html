@@ -8,20 +8,49 @@
 <body>
 <div class="container">
     <div class="text">
-<p>Welcome to the</p>
-<h2>Medical Term Dissector website.</h2>
+        <p>Welcome to the</p>
+        <h2>Medical Term Dissector website.</h2>
         <br>
-<h5>Instructions: Simply type a word below, and you will be told the meaning of each part of the word. <br>Use this to
-    help you learn the common roots, prefixes and suffixes of medical terms so you won't have to <br>look up the
-    definition every time someone says a medical term you haven't heard before, because <br>these affixes and roots often
-    define the meaning of the word very well. For example type hypoglycemia.</h5>
+        <h5>Instructions: </h5>
+        <p>Simply type a word below, and you will be told the meaning of each part of the word. <br>Use
+            this to
+            help you learn the common roots, prefixes and suffixes of medical terms so you won't have to <br>look up the
+            definition every time someone says a medical term you haven't heard before, because <br>these affixes and
+            roots often
+            define the meaning of the word very well. For example type hypoglycemia.</p>
     </div>
     <div class="submitWord">
-<input class="textbox" type="text" id="inputTerm">
-<button class="submitbtn" onclick="obtainJson()">submit</button>
+        <input class="textbox" type="text" id="inputTerm">
+        <button class="submitbtn" onclick="obtainJson()">submit</button>
     </div>
-<div id="results" style="color:green;"></div>
+</div>
 <script src="result.js"></script>
+<div class="results">
+    <div class="table">
+        <p>Hypoglycemia</p>
+        <table>
+            <tr>
+                <th>AffixPart</th>
+                <th>Meaning</th>
+                <th>Examples</th>
+            </tr>
+            <tr>
+                <td>hyp(o)-</td>
+                <td>lack of</td>
+                <td>hypovolemia</td>
+            </tr>
+            <tr>
+                <td>glyc-</td>
+                <td>sugar</td>
+                <td>glycoma</td>
+            </tr>
+            <tr>
+                <td>-emia</td>
+                <td>blood</td>
+                <td>dosemia</td>
+            </tr>
+        </table>
+    </div>
 </div>
 </body>
 </html>

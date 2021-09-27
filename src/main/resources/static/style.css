@@ -1,9 +1,11 @@
 body {
+    width: 100%;
 }
 
 *{
     margin: 0;
     padding: 0;
+    /*outline: .1rem solid black; !*Use for debugging, remove it when you want to see how page looks normally. *!*/
 }
 
 .container {
@@ -19,7 +21,7 @@ body {
 
 .submitWord {
     position: absolute;
-    bottom: 25%;
+    bottom: 30%;
     width: 50%;
     left: 25%;
 }
@@ -41,4 +43,37 @@ body {
     font-size: 1.5rem;
     left: 15%;
     top: 10%;
+    right: 15%;
+}
+
+.text > p {
+    font-size: 1rem;
+}
+
+.results {
+    color: green;
+    position: relative;
+    font-size: 1rem;
+    margin: auto;
+    width: 76rem;
+    height: 25rem;
+    margin-top: 1rem;
+    outline: .1rem solid black;
+}
+
+.table {
+    position: absolute;
+    font-size: 1.3rem;
+    top: 10%;
+    left: 35%;
+}
+
+th, td {
+    padding: .4rem;
+}
+
+.table > p {
+    margin-bottom: 1rem;
+    text-align: center;
+    text-decoration-line: underline;
 }
