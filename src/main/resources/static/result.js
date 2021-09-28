@@ -1,36 +1,51 @@
 function showDissectedResults(data) {
-    console.log(data)
-    const affixMap = data.affixMap
-    const term = data.term
-    const definition = data.definition
-    const affixMapKeys = Object.keys(affixMap);
-    const resultsDiv = document.getElementById("results");
-    console.log(affixMapKeys)
+    let resultExists = document.getElementById("results")
+    if (resultExists) {
+        resultExists.remove()
+    }
+    const affixMapKeys = Object.keys(data.affixMap)
+    const body = document.body
+    const div = document.createElement("div")
+    const table = document.createElement("table")
+    div.id = "results"
+    div.className = "results"
+    let tableRow = document.createElement("tr")
+    let wordPartHeader = document.createElement("th")
+    wordPartHeader.innerText = "Word part"
+    let affixHeader = document.createElement("th")
+    affixHeader.innerText = "Affix"
+    let meaningHeader = document.createElement("th")
+    meaningHeader.innerText = "Meaning"
+    let examplesHeader = document.createElement("th")
+    examplesHeader.innerText = "Examples"
+    tableRow.append(wordPartHeader, affixHeader, meaningHeader, examplesHeader)
+    table.append(tableRow)
     for (let i = 0; i < affixMapKeys.length; i++) {
-        const affixMapElement = document.createElement("p");
-        console.log(affixMapKeys[i])
-        affixMapElement.innerText = `${affixMapKeys[i]}`;
-        resultsDiv.append(affixMapElement);
         let key = affixMapKeys[i]
-        if (affixMap[`${key}`] !== null) {
-            for (let j = 0; j < affixMap[`${key}`].length; j++) {
-                const affixMapElement = document.createElement("p");
-                console.log(affixMap[`${key}`][j].affix)
-                affixMapElement.innerText = affixMap[`${key}`][j].affix;
-                resultsDiv.append(affixMapElement);
-                const affixMapElement2 = document.createElement("p");
-                console.log(affixMap[`${key}`][j].meaning)
-                affixMapElement2.innerText = affixMap[`${key}`][j].meaning;
-                resultsDiv.append(affixMapElement2);
-                const affixMapElement3 = document.createElement("p");
-                console.log(affixMap[`${key}`][j].examples)
-                affixMapElement3.innerText = affixMap[`${key}`][j].examples;
-                resultsDiv.append(affixMapElement3);
+        if (data.affixMap[`${key}`] !== null) {
+            for (let j = 0; j < data.affixMap[`${key}`].length; j++) {
+                let wordPart = document.createElement("td")
+                if (j > 0) {
+                wordPart.innerText = `${affixMapKeys[i]}` + `(${j+1})`
+                } else {
+                    wordPart.innerText = `${affixMapKeys[i]}`
+                }
+                let affix = document.createElement("td")
+                affix.innerText = data.affixMap[`${key}`][j].affix
+                let meaning = document.createElement("td")
+                meaning.innerText = data.affixMap[`${key}`][j].meaning
+                let examples = document.createElement("td")
+                examples.innerText = data.affixMap[`${key}`][j].examples
+                tableRow = document.createElement("tr")
+                tableRow.append(wordPart, affix, meaning, examples)
+                table.append(tableRow)
             }
         } else {
-            console.log(key + " is null")
+            continue
         }
     }
+    div.append(table)
+    body.append(div)
 }
 
 function obtainJson() {
