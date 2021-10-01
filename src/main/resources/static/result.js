@@ -20,6 +20,10 @@ function showDissectedResults(data) {
     examplesHeader.innerText = "Examples"
     tableRow.append(wordPartHeader, affixHeader, meaningHeader, examplesHeader)
     table.append(tableRow)
+    if (affixMapKeys.length > 6) {
+        let increaseSizeAmount = affixMapKeys.length - 6
+        div.style.height = 17 + increaseSizeAmount + "rem"
+    }
     for (let i = 0; i < affixMapKeys.length; i++) {
         let key = affixMapKeys[i]
         if (data.affixMap[`${key}`] !== null) {
