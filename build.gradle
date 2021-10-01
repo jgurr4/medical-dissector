@@ -2,6 +2,8 @@ plugins {
     id 'org.springframework.boot' version '2.5.3'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
 }
 
 group = 'com.wild'
@@ -14,6 +16,14 @@ repositories {
 
 ext {
     set('testcontainersVersion', "1.15.3")
+}
+
+application {
+    mainClass = 'com.wild.medicalTermDissector.MedTermDissector'
+}
+
+shadow {
+    mainClassName = application.mainClass.get()
 }
 
 dependencies {
@@ -36,6 +46,10 @@ dependencyManagement {
     imports {
         mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
     }
+}
+
+shadowJar {
+    archiveClassifier.set('fat')
 }
 
 test {
