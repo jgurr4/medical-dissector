@@ -1,3 +1,15 @@
+const input = document.querySelector("input")
+input.addEventListener("keydown", e => {
+    // console.log(e)   //uncomment this if you want to see key codes and names etc...
+    clickPress(e)
+})
+
+function clickPress(e) {
+    if (e.keyCode == 13) {
+        obtainJson()
+    }
+}
+
 function showDissectedResults(data) {
     let resultExists = document.getElementById("results")
     if (resultExists) {
