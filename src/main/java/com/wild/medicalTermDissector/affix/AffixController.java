@@ -1,11 +1,7 @@
 package com.wild.medicalTermDissector.affix;
 
-import com.wild.medicalTermDissector.medicalTerms.MedTermService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 import java.util.Map;
 
 @RestController

@@ -3,12 +3,15 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
     id 'application'
-    id 'com.github.johnrengelman.shadow' version '5.2.0'
 }
 
 group = 'com.wild'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '16'
+
+apply plugin: 'application'
+
+mainClassName = 'com.wild.medicalTermDissector.MedTermDissector'
 
 repositories {
     mavenCentral()
@@ -18,27 +21,19 @@ ext {
     set('testcontainersVersion', "1.15.3")
 }
 
-application {
-    mainClass = 'com.wild.medicalTermDissector.MedTermDissector'
-}
-
-shadow {
-    mainClassName = application.mainClass.get()
-}
-
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-couchbase-reactive'
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
+//    implementation 'org.springframework.boot:spring-boot-starter-data-couchbase-reactive'
+//    implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
+//    implementation 'org.springframework.boot:spring-boot-starter-mail'
+//    testImplementation 'io.projectreactor:reactor-test'
+//    testImplementation 'org.testcontainers:couchbase'
+//    testImplementation 'org.testcontainers:mariadb'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'io.projectreactor:reactor-test'
-    testImplementation 'org.testcontainers:couchbase'
     testImplementation 'org.testcontainers:junit-jupiter'
-    testImplementation 'org.testcontainers:mariadb'
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
 
@@ -46,10 +41,6 @@ dependencyManagement {
     imports {
         mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
     }
-}
-
-shadowJar {
-    archiveClassifier.set('fat')
 }
 
 test {

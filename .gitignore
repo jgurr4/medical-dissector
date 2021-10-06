@@ -40,3 +40,5 @@ out/
 application.properties
 apikeyonly.html
 oauth2.html
+*.swp
+problems
