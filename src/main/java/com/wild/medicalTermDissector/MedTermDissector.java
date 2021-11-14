@@ -1,6 +1,7 @@
 package com.wild.medicalTermDissector;
 
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
@@ -8,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -24,7 +26,7 @@ public class MedTermDissector {
   @EnableWebSecurity
   public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    //Code below ensures that we have the security disabled which stops cross-site checking. That way we can run post requests successfully.
+    //Code below ensures that we have the security disabled which stops cross-site checking. That way we can run post requests externally successfully.
     @Override
     protected void configure(HttpSecurity http) throws Exception {
       http.httpBasic().disable();

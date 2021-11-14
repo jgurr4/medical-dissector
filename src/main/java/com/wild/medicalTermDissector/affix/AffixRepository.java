@@ -20,4 +20,5 @@ public interface AffixRepository extends JpaRepository<Affix, Integer> {
 
   @Query(value = "select id, affix, meaning, examples, readable_affix, locate(readable_affix, ?1) as is_match from affix_view having is_match > 0", nativeQuery = true)
   List<Affix> findByMedTerm(String medTerm);
+
 }
