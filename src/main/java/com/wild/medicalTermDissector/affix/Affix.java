@@ -9,28 +9,30 @@ public class Affix {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Integer id;
+  private Integer def_id;
   private String affix;
   private String meaning;
   private String examples;
-  private String readableAffix;
+  private String readable_affix;
 
   public Affix() {
   }
 
-  public Affix(Integer id, String affix, String meaning, String examples, String readableAffix) {
+  public Affix(Integer id, Integer def_id, String affix, String meaning, String examples, String readableAffix) {
     this.id = id;
+    this.def_id = def_id;
     this.affix = affix;
     this.meaning = meaning;
     this.examples = examples;
-    this.readableAffix = readableAffix;
+    this.readable_affix = readableAffix;
   }
 
-  public String getReadableAffix() {
-    return readableAffix;
+  public String getReadable_affix() {
+    return readable_affix;
   }
 
-  public void setReadableAffix(String readableAffix) {
-    this.readableAffix = readableAffix;
+  public void setReadable_affix(String readable_affix) {
+    this.readable_affix = readable_affix;
   }
 
   public Integer getId() {
@@ -68,12 +70,20 @@ public class Affix {
   @Override
   public String toString() {
     return "Affix{" +
-      "id=" + id +
-      "affix='" + affix + '\'' +
-      ", meaning='" + meaning + '\'' +
-      ", examples='" + examples + '\'' +
-      ", readableAffix='" + readableAffix + '\'' +
-      '}';
+        "id=" + id +
+        ", def_id=" + def_id +
+        ", affix='" + affix + '\'' +
+        ", meaning='" + meaning + '\'' +
+        ", examples='" + examples + '\'' +
+        ", readableAffix='" + readable_affix + '\'' +
+        '}';
   }
 
+  public Integer getDef_id() {
+    return def_id;
+  }
+
+  public void setDef_id(Integer def_id) {
+    this.def_id = def_id;
+  }
 }

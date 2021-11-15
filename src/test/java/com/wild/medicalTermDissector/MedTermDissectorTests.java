@@ -36,7 +36,6 @@ class MedTermDissectorTests {
   }
 
 
-/*
   @Disabled
   @BeforeAll
   @Test
@@ -102,6 +101,11 @@ class MedTermDissectorTests {
     final List<MedTerm> medTermsList = medTermService.getMedTerms("hy");
 //    System.out.println("\n" + medTermsList + "\n");
     assertFalse(medTermsList.isEmpty());
+  }
+
+  @Test
+  public void findByMedTermTest() {
+    assertEquals("hypo", affixRepository.findByMedTerm("hypoglycemia").get(0).getReadable_affix());
   }
 
   @Disabled
@@ -261,7 +265,6 @@ class MedTermDissectorTests {
     affixService.printDissectedParts(dissectedParts);
     assertNull(dissectedParts.affixMap.get("esthesi"));
   }
- */
 
 /*
   //TODO: This test will work better if I decide to add base words with their definitions to the affix_view table.

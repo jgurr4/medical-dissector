@@ -59,8 +59,8 @@ public class AffixService {
     ArrayList<String> affixes = new ArrayList<>();
     int[] affixLengths = new int[allPossibleAffixes.size()];
     for (int i = 0; i < allPossibleAffixes.size(); i++) {
-      allPossibleAffixes.get(i).getReadableAffix().length();
-      affixes.add(allPossibleAffixes.get(i).getReadableAffix());
+      allPossibleAffixes.get(i).getReadable_affix().length();
+      affixes.add(allPossibleAffixes.get(i).getReadable_affix());
       affixLengths[i] = affixes.get(i).length();
     }
     int minNum = affixLengths[0];

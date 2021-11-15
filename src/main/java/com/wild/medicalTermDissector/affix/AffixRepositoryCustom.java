@@ -3,7 +3,7 @@ package com.wild.medicalTermDissector.affix;
 
 import java.util.List;
 
-public interface CustomAffixRepository {
+public interface AffixRepositoryCustom {
 
   List<Affix> findByAffixFullText(String letters);
 
