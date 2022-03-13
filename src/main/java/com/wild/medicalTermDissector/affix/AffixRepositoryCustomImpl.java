@@ -26,18 +26,10 @@ public class AffixRepositoryCustomImpl implements AffixRepositoryCustom {
 
   @Override
   public List<Affix> findByMedTerm(String medTerm) {
-    // recreate this query:
-    // select id, affix, meaning, examples, readable_affix, locate(readable_affix, ?1) as is_match from affix_view having is_match > 0
-/*
-    SessionFactory sf = new Sess  .createEntityManager()
-    Session session = sf.openSession();
-*/
     final Session session = sessionFactory.openSession();
     final CriteriaBuilder cb = session.getCriteriaBuilder();
     final CriteriaQuery<Affix> cr = cb.createQuery(Affix.class);
     final Root<Affix> affix = cr.from(Affix.class);
-    // FIXME: Currently this command has one minor problem. It generates locate() backwards, which means it fails to get
-    // any results from mysql database.
     final CriteriaQuery<Affix> query = cr.multiselect(
         affix.get("id"),
         affix.get("def_id"),
